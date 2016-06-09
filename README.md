@@ -37,6 +37,8 @@ No specific mathematical expertise is required. Some familiarity with statistica
         - for MAC check the prerequisite installation instructions https://github.com/stan-dev/rstan/wiki/RStan-Mac-OS-X-Prerequisite-Installation-Instructions
 - Although it is not required, it is recommend installing RStudio https://www.rstudio.com
 
+- R packages BRugs, R2OpenBUGS, rjags, rstanarm are also required
+ 
 ### Contributors
 
 * Paola Berchialla
