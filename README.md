@@ -12,9 +12,30 @@ Bayesian methods are getting increasingly popular since they can allow for fitti
 
 The course is intended for students, researchers from all disciplines and clinicians who want a ground-floor introduction to Bayesian data analysis for medical data.
 
+## Program
+- Introduction to Bayesian Inference
+- Hierarchical Modeling
+    - with examples in BUGS
+- Bayesian meta-analysis
+- Introduction to MCMC
+- Predictive Distribution Model Checking
+    - missing values handling
+- Bayesian disease mapping
+- Prior calibration
+
 ## Course Prerequisites
 
 No specific mathematical expertise is required. Some familiarity with statistical methods such as t-test and linear regression can be helpful, as well as some previous experience with programming in R, but they are not critical.
+
+## Software
+- R version 3.0.2 or later http://www.r-project.org/
+- OpenBUGS http://www.openbugs.net/w/FrontPage
+- JAGS http://mcmc-jags.sourceforge.net/
+- RStan https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
+    - make sure to carefully follow all the instructions and setup correctly the toolchain 
+        - for Windows, you need to install Rtools on Windows https://github.com/stan-dev/rstan/wiki/Install-Rtools-for-Windows
+        - for MAC check the prerequisite installation instructions https://github.com/stan-dev/rstan/wiki/RStan-Mac-OS-X-Prerequisite-Installation-Instructions
+- Although it is not required, it is recommend installing RStudio https://www.rstudio.com
 
 ### Contributors
 
