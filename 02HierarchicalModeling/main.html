@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bayesian Data Analysis for Medical Data</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="main_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Bayesian Data Analysis for Medical Data',
+                        subtitle: 'Hierarchical Modeling',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: 'main_files/logo.jpg',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Paola Berchialla' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(main_files/logo.jpg) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets\css\ioslides.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="main_files/logo.jpg"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<style>
+  .col2 {
+    columns: 2 200px;         /* number of columns and width in pixels*/
+    -webkit-columns: 2 200px; /* chrome, safari */
+    -moz-columns: 2 200px;    /* firefox */
+  }
+ </style>
+
+<slide class=''><hgroup><h2>A simple motivating example</h2></hgroup><article  id="a-simple-motivating-example">
+
+<ul>
+<li>Suppose \(K\) groups or units under investigation:
+
+<ul>
+<li>a sample of responses \(Y_{ik}\), \(i=1,\ldots n_k\) and \(k = 1,\ldots, K\)</li>
+</ul></li>
+</ul>
+
+<p>Consider two alternative models:</p>
+
+<ol>
+<li>A model that estimates a common mean effect \(\mu\) (pooled effect)
+
+<ul>
+<li>when a normal distribution is assume, the model is expressed as \[
+Y_{ik} \sim N(\mu,\sigma^2) \text{ for } i=1,\ldots n_k \text{ and } k = 1,\ldots, K
+\]</li>
+</ul></li>
+<li>A model that estimates different independent mean effects \(\mu_k\) for each group (fixed effects)
+
+<ul>
+<li>when a normal distribution is assume, the model is expressed as \[
+Y_{ik} \sim N(\mu_k,\sigma^2) \text{ for } i=1,\ldots n_k \text{ and } k = 1,\ldots, K
+\]</li>
+</ul></li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>A simple motivating example</h2></hgroup><article  id="a-simple-motivating-example-1">
+
+<p>\[
+  Y_{ik} \sim N(\mu_k,\sigma^2) \text{ for } i=1,\ldots n_k \text{ and } k = 1,\ldots, K
+\]</p>
+
+<ul>
+<li>It estimates the expected performance of each group/unit</li>
+<li>Each mean effect \(\mu_k\) is estimated independently from the other groups
+
+<ul>
+<li>in a group with small sample size, the posterior uncertainty will be large</li>
+</ul></li>
+<li>It is logical to assume all \(\mu_k\)s are observables from a popolation distribution with mean \(\mu\), an overall population average effect \[
+\mu_k \sim N(\mu,w^2)
+\]</li>
+<li>All mean effects allow for <em>borrowing strengh</em> between groups/units
+
+<ul>
+<li>the posterior mean of each \(\mu_k\) is a weighted mean of the corresponding sample mean of the \(k\)-group and the overall mean effect \(\mu\)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Repeated measurements of blood pressure</h2></hgroup><article  id="repeated-measurements-of-blood-pressure">
+
+<ul>
+<li>Consider the repeated measurements of blood pressure from 20 healthy individuals
+
+<ul>
+<li>the aim is to estimate within-individual and between-individual variability</li>
+</ul></li>
+</ul>
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left">Individual</th>
+<th align="left">1</th>
+<th align="left">2</th>
+<th align="left">3</th>
+<th align="left">4</th>
+<th align="left">5</th>
+<th align="left">6</th>
+<th align="left">7</th>
+<th align="left">8</th>
+<th align="left">9</th>
+<th align="left">10</th>
+<th align="left">11</th>
+<th align="left">12</th>
+<th align="left">13</th>
+<th align="left">14</th>
+<th align="left">15</th>
+<th align="left">16</th>
+<th align="left">17</th>
+<th align="left">18</th>
+<th align="left">19</th>
+<th align="left">20</th>
+</tr>
+<tr class="odd">
+<td align="left">1st</td>
+<td align="left">108</td>
+<td align="left">91</td>
+<td align="left">93</td>
+<td align="left">104</td>
+<td align="left">99</td>
+<td align="left">95</td>
+<td align="left">93</td>
+<td align="left">99</td>
+<td align="left">90</td>
+<td align="left">92</td>
+<td align="left">101</td>
+<td align="left">97</td>
+<td align="left">97</td>
+<td align="left">96</td>
+<td align="left">106</td>
+<td align="left">100</td>
+<td align="left">90</td>
+<td align="left">88</td>
+<td align="left">92</td>
+<td align="left">100</td>
+</tr>
+<tr class="even">
+<td align="left">2nd</td>
+<td align="left">98</td>
+<td align="left">94</td>
+<td align="left">96</td>
+<td align="left">99</td>
+<td align="left">97</td>
+<td align="left">98</td>
+<td align="left">97</td>
+<td align="left">96</td>
+<td align="left">100</td>
+<td align="left">95</td>
+<td align="left">89</td>
+<td align="left">97</td>
+<td align="left">100</td>
+<td align="left">95</td>
+<td align="left">100</td>
+<td align="left">98</td>
+<td align="left">99</td>
+<td align="left">98</td>
+<td align="left">92</td>
+<td align="left">101</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Model formulation</h2></hgroup><article  id="model-formulation">
+
+<p>\[
+Y_{ij} = \mu + a_i + \epsilon_{ij} \quad \text{with } \epsilon_{ij}\sim N(0,\sigma^2) \text{ and } a_i\sim N(0,\sigma_a^2)
+\]</p>
+
+<p>equivalently</p>
+
+<p>\[
+Y_{ij} \sim N(\mu_{ij}, \sigma^2) \quad \text{with } \mu_{ij}=\mu + a_i  \text{ and } a_i\sim N(0,\sigma_a^2)
+\]</p>
+
+<ul>
+<li>\(\sigma^2_a\) (random effects variance): it measures the between-subject variability</li>
+<li><p>\(\sigma^2\): it accounts for the remaining within-subject variability</p></li>
+<li><p>Prior distributions with large variances can be used when no information is available \[
+\mu \sim N(0, 1000) \quad \sigma^2\sim IG(0.001, 0.001) \text{ and } \sigma^2_a\sim IG(0.001, 0.001)
+\]</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Equivalent model formulation</h2></hgroup><article  id="equivalent-model-formulation">
+
+<p>This model is equivalent to assuming \[
+{\mathbf y}_i \vert \mu, \sigma^2, \sigma^2_a \sim N_2\left( \boldsymbol{\mu}, \left[
+\begin{array} {cc}
+\sigma^2 + \sigma^2_a &amp;  \sigma^2_a \\
+\sigma^2_a &amp;  \sigma^2 + \sigma^2_a\\ 
+\end{array}\right]
+\right)
+\] where \(\mathbf y_i = (Y_{i1}, Y_{i2})^T\) and \(\boldsymbol{\mu} = (1,1)^T\) and the parameters are given by</p>
+
+<p>\[
+\begin{eqnarray}
+E(Y_{ij}) &amp; = &amp; \mu\\
+Var(Y_{ij}) &amp; = &amp; Var(a_i) + Var(\epsilon_{ij}) = \sigma_a^2 + \sigma^2 \\
+Cov(Y_{i1}, Y_{i2}) &amp; = &amp; Cov(\mu + a_i + \epsilon_{i1}, \mu + a_i + \epsilon_{i2}) \\
+ &amp; = &amp; Var(a_i) + Cov(a_i,\epsilon_{i2}) +  Cov(\epsilon_{i1}, a_i) + 
+ Cov(\epsilon_{i1},\epsilon_{i2})\\
+&amp; = &amp; \sigma_a^2
+\end{eqnarray}
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Model formulation</h2></hgroup><article  id="model-formulation-1">
+
+<ul>
+<li>The total variability of the response \(Y_{ij}\) is equal to \(\sigma^2_a +\sigma^2\)</li>
+<li>The covariance between two measurements of subject \(i\) is equal to the between-subject variability (the random effect variance)</li>
+<li><p>The within-subject correlation is given by \[
+r_{12} = Cor(Y_{i1}, Y_{i2}) = \frac{\sigma_a^2}{\sigma^2_a +\sigma^2}
+\]</p></li>
+<li>The two model formulation are equivalent but <em>the hierarchical structure</em>:
+
+<ul>
+<li>facilitates the model</li>
+<li>provides estimates of individual effects</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Model formulation in BUGS</h2></hgroup><article  id="model-formulation-in-bugs" class="smaller">
+
+<pre class = 'prettyprint lang-r'>model {
+    for  (i  in 1:n) { 
+           for (j in 1:K){ 
+                     y[i,j] ~ dnorm( mu[i,j], tau )
+                     mu[i,j] &lt;- m + a[i]
+          }
+        a[i]~dnorm( 0, tau.a)
+    }       
+    # prior distributions
+    m ~ dnorm( 0.0, 0.001)
+    tau~dgamma(0.001, 0.001)
+    tau.a~dgamma(0.001, 0.001)
+
+    s2   &lt;- 1/tau
+    s2.a &lt;- 1/tau.a
+    ts2  &lt;- s2+s2.a
+    
+    cor &lt;- s2.a/ts2</pre>
+
+</article></slide><slide class=''><hgroup><h2>OpenBUGS through R2OpenBUGS</h2></hgroup><article  id="openbugs-through-r2openbugs" class="smaller">
+
+<pre class = 'prettyprint lang-r'>mymodel = function() {
+    for  (i  in 1:n) { 
+           for (j in 1:K){ 
+                     y[i,j] ~ dnorm( mu[i,j], tau )
+                     mu[i,j] &lt;- m + a[i]
+          }
+        a[i]~dnorm( 0, tau.a)
+    }       
+    # prior distributions
+    m ~ dnorm( 0.0, 0.001)
+    tau~dgamma(0.001, 0.001)
+    tau.a~dgamma(0.001, 0.001)
+
+    s2   &lt;- 1/tau
+    s2.a &lt;- 1/tau.a
+    ts2  &lt;- s2+s2.a
+    
+    cor &lt;- s2.a/ts2
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>OpenBUGS through R2OpenBUGS</h2></hgroup><article  id="openbugs-through-r2openbugs-1" class="smaller">
+
+<pre class = 'prettyprint lang-r'>library(R2OpenBUGS)
+
+data &lt;- list(n=20, K=2, 
+y=structure(.Data=c(108, 98, 91, 94, 93, 96, 104, 99, 99, 97, 95, 98, 93, 97, 99, 96, 
+90, 100, 92, 95, 101, 89, 97, 97, 97, 100, 96, 95, 106, 100, 100, 98, 90, 99, 88, 98,  
+92, 92, 100, 101), .Dim = c(20, 2) ) )
+
+bugsInits &lt;- function() {
+  return(list(m=0, tau = 0.001, tau.a = 0.001, a=rep(1,20)))}
+
+parameters &lt;- c(&#39;m&#39;, &#39;tau&#39;, &#39;tau.a&#39;, &#39;s2&#39;,&#39;s2.a&#39;,&#39;ts2&#39;,&#39;cor&#39;)
+
+resbugs = bugs(data, inits=bugsInits, parameters.to.save=parameters, model.file=mymodel,
+n.chains=1, n.iter=10000, n.burnin=2000, n.thin=1,
+                debug=TRUE, DIC=T)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Results</h2></hgroup><article  id="results" class="smaller">
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left"></th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">2.5%</th>
+<th align="right">25%</th>
+<th align="right">50%</th>
+<th align="right">75%</th>
+<th align="right">97.5%</th>
+</tr>
+<tr class="odd">
+<td align="left">m</td>
+<td align="right">96.68</td>
+<td align="right">0.75</td>
+<td align="right">95.25</td>
+<td align="right">96.18</td>
+<td align="right">96.68</td>
+<td align="right">97.18</td>
+<td align="right">98.16</td>
+</tr>
+<tr class="even">
+<td align="left">tau</td>
+<td align="right">0.06</td>
+<td align="right">0.01</td>
+<td align="right">0.03</td>
+<td align="right">0.05</td>
+<td align="right">0.05</td>
+<td align="right">0.06</td>
+<td align="right">0.09</td>
+</tr>
+<tr class="odd">
+<td align="left">tau.a</td>
+<td align="right">92.25</td>
+<td align="right">245.14</td>
+<td align="right">0.10</td>
+<td align="right">0.49</td>
+<td align="right">4.98</td>
+<td align="right">61.20</td>
+<td align="right">776.92</td>
+</tr>
+<tr class="even">
+<td align="left">s2</td>
+<td align="right">19.21</td>
+<td align="right">5.02</td>
+<td align="right">11.30</td>
+<td align="right">15.66</td>
+<td align="right">18.59</td>
+<td align="right">22.00</td>
+<td align="right">31.03</td>
+</tr>
+<tr class="odd">
+<td align="left">s2.a</td>
+<td align="right">1.62</td>
+<td align="right">2.91</td>
+<td align="right">0.00</td>
+<td align="right">0.02</td>
+<td align="right">0.20</td>
+<td align="right">2.04</td>
+<td align="right">9.99</td>
+</tr>
+<tr class="even">
+<td align="left">ts2</td>
+<td align="right">20.84</td>
+<td align="right">5.11</td>
+<td align="right">13.15</td>
+<td align="right">17.25</td>
+<td align="right">20.04</td>
+<td align="right">23.58</td>
+<td align="right">33.06</td>
+</tr>
+<tr class="odd">
+<td align="left">cor</td>
+<td align="right">0.07</td>
+<td align="right">0.12</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.01</td>
+<td align="right">0.10</td>
+<td align="right">0.41</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Plot of the random effects</h2></hgroup><article  id="plot-of-the-random-effects">
+
+<pre class = 'prettyprint lang-r'>library(plotrix)
+randomEffects &lt;- resbugs$sims.list$a
+
+SS &lt;- apply(randomEffects, 2, FUN = function(x)
+  {c(quantile(x, probs = c(0.025)), mean(x), quantile(x, probs = c(0.975)))})
+
+plotCI(SS[2,],1:20, err=&#39;x&#39;, ui = SS[3,], li = SS[1,], xlab=&#39;&#39;, ylab=&#39;&#39;)
+abline(v=0, lty=2)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Plot of the random effects</h2></hgroup><article  id="plot-of-the-random-effects-1">
+
+<p><img src="main_files/figure-html/unnamed-chunk-5-1.png" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>OpenBUGS through BRugs</h2></hgroup><article  id="openbugs-through-brugs" class="smaller">
+
+<pre class = 'prettyprint lang-r'>modelString &lt;- &quot;model {
+    for  (i  in 1:n) { 
+           for (j in 1:K){ 
+                     y[i,j] ~ dnorm( mu[i,j], tau )
+                     mu[i,j] &lt;- m + a[i]
+          }
+        a[i]~dnorm( 0, tau.a)
+    }       
+    # prior distributions
+    m ~ dnorm( 0.0, 0.001)
+    tau~dgamma(0.001, 0.001)
+    tau.a~dgamma(0.001, 0.001)
+
+    s2   &lt;- 1/tau
+    s2.a &lt;- 1/tau.a
+    ts2  &lt;- s2+s2.a
+    
+    cor &lt;- s2.a/ts2
+}&quot;</pre>
+
+</article></slide><slide class=''><hgroup><h2>OpenBUGS through BRugs</h2></hgroup><article  id="openbugs-through-brugs-1">
+
+<pre class = 'prettyprint lang-r'>.temp = file(&quot;model1.txt&quot;,&quot;w&quot;)  
+writeLines(modelString,con=.temp) 
+close(.temp)</pre>
+
+</article></slide><slide class=''><hgroup><h2>OpenBUGS through BRugs</h2></hgroup><article  id="openbugs-through-brugs-2" class="smaller">
+
+<pre class = 'prettyprint lang-r'>library(BRugs)
+
+data &lt;- list(n=20, K=2, 
+y=structure(.Data=c(108, 98, 91, 94, 93, 96, 104, 99, 99, 97, 95, 98, 93, 97, 99, 96, 90, 100, 92, 95, 101, 
+89, 97, 97, 97, 100, 96, 95, 106, 100, 100, 98, 90, 99, 88, 98,  92, 92, 100, 101), 
+.Dim = c(20, 2) ) )
+
+modelCheck(&#39;model1.txt&#39;)
+modelData(bugsData(data))
+modelCompile()
+inits1=list(m=0, tau = 0.01, tau.a = 0.01, a=rep(1,20))
+BRugs::bugsInits(list(inits1), numChains=1, fileName=&#39;inits1.txt&#39;) 
+
+#eventuallymodelGenInits()
+modelInits(BRugs::bugsInits(list(inits1), numChains=1))
+modelUpdate(20000)     
+
+# set parameters and update model
+parameters &lt;- c(&#39;m&#39;, &#39;tau&#39;, &#39;tau.a&#39;, &#39;s2&#39;,&#39;s2.a&#39;,&#39;ts2&#39;,&#39;cor&#39;)
+samplesSet(parameters)     
+dicSet()
+modelUpdate(50000)       </pre>
+
+</article></slide><slide class=''><hgroup><h2>Results</h2></hgroup><article  id="results-1">
+
+<pre class = 'prettyprint lang-r'>#sample stats
+samplesStats(&quot;*&quot;) 
+samplesStats(&quot;s2.a&quot;, thin=10) 
+
+samplesSample(&quot;s2.a&quot;)
+
+samplesDensity(&quot;*&quot;)              # plot the densities,
+samplesHistory(&quot;*&quot;, mfrow = c(2, 2)) # plot the chain,
+
+samplesDensity(&quot;tau&quot;)              # plot the densities,
+samplesDensity(&quot;m&quot;, thin=50)        plot the densities,
+
+samplesBgr(&quot;*&quot;)             # plot the bgr statistics
+samplesAutoC(&quot;*&quot;, 1)     # plot autocorrelation</pre>
+
+</article></slide><slide class=''><hgroup><h2>JAGS</h2></hgroup><article  id="jags">
+
+<pre class = 'prettyprint lang-r'>parameters &lt;- c(&#39;m&#39;, &#39;tau&#39;, &#39;tau.a&#39;, &#39;s2&#39;,&#39;s2.a&#39;,&#39;ts2&#39;,&#39;cor&#39;)
+adaptSteps = 500              # Number of steps to &quot;tune&quot; the samplers.
+burnInSteps = 5000            # Number of steps to &quot;burn-in&quot; the samplers.
+nChains = 1                  # Number of chains to run.
+numSavedSteps=50000           # Total number of steps in chains to save.
+thinSteps=1                   # Number of steps to &quot;thin&quot; (1=keep every step).
+nIter = ceiling( ( numSavedSteps * thinSteps ) / nChains ) # Steps per chain.
+
+jagsModel = jags.model( &quot;model1.txt&quot; , data=data,  inits=inits1 ,
+                        n.chains=nChains , n.adapt=adaptSteps )</pre>
+
+</article></slide><slide class=''><hgroup><h2>JAGS</h2></hgroup><article  id="jags-1">
+
+<pre class = 'prettyprint lang-r'>cat( &quot;Burning in the MCMC chain...\n&quot; )
+update( jagsModel , n.iter=burnInSteps )
+# The saved MCMC chain:
+cat( &quot;Sampling final MCMC chain...\n&quot; )
+codaSamples = coda.samples( jagsModel , variable.names=parameters ,
+                            n.iter=nIter , thin=thinSteps )
+
+plot(codaSamples)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Just Another Example: analysis of odds ratio from various studies</h2></hgroup><article  id="just-another-example-analysis-of-odds-ratio-from-various-studies">
+
+<ul>
+<li>The hierarchical structure naturally arise in meta-analysis
+
+<ul>
+<li>similar parameters are estimated in different studies under different circumstances</li>
+</ul></li>
+</ul>
+
+<div class="col2">
+<p><img src="images/or1.png" width="400px" height="300px" /> <img src="images/or2.png" width="400px" height="300px" /></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Model formulation (first 7 studies)</h2></hgroup><article  id="model-formulation-first-7-studies">
+
+<ul>
+<li><p>The sample estimates of the log-odds ratios are asymptotically normal \[
+\begin{eqnarray}
+\log\hat{\text{OR}}_k &amp;\sim &amp; N(\theta_k, \hat{\sigma}^2_k) \\
+\theta_k &amp;\sim &amp; N(\theta, \hat{\sigma}^2_\theta) \quad \text{for } k=1,2,\ldots 7, i=1,2\\
+\end{eqnarray}
+\]</p></li>
+<li><p>\(\hat{\sigma}_k\) is the standard error of the corresponding \(\log\hat{\text{OR}}_k\) computed by \[
+\hat{\sigma}_k = \log(U/L)/(2\times 1.96)
+\] with \(U\) and \(L\) the upper and lower limit of the 95% confidence interval of the odds ratio</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Model formulation in BUGS</h2></hgroup><article  id="model-formulation-in-bugs-1">
+
+<pre class = 'prettyprint lang-r'>for (k in 1:K1){ 
+         logor[k] &lt;- log(or[k])
+         selogor[k] &lt;- log(U[k]/L[k])/(2*1.96)
+         precision.logor[k] &lt;- 1/pow(  selogor[k], 2) 
+         logor[k] ~ dnorm( theta[k],  precision.logor[k] ) 
+         theta[k]~dnorm( mu.theta, tau.theta )
+         OR[k] &lt;- exp(theta[k]) 
+    }</pre>
+
+</article></slide><slide class=''><hgroup><h2>Model formulation (last 3 studies)</h2></hgroup><article  id="model-formulation-last-3-studies" class="smaller">
+
+<ul>
+<li>For the last 3 studies the full (aggregated) data are available</li>
+</ul>
+
+<p>\[
+\begin{eqnarray}
+Y_{i1k} &amp;\sim &amp; Bin(\pi_{i1k}, Y_{i1k}+Y_{i2k}) \\
+\log\left(\frac{\pi_{i1k}}{1-\pi_{i1k}}\right)  &amp; = &amp; a_k +\theta_k I(i=1)\\
+\theta_k &amp;\sim &amp; N(\theta, \hat{\sigma}^2_\theta) \quad \text{for } k=8,9,10, i=1,2\\
+\end{eqnarray}
+\]</p>
+
+<ul>
+<li>\(Y_{ijk}\) refers to the number of observations in the \(k\)-th study
+
+<ul>
+<li>with smoking and cancer status \(i\) (1=smokers, 2=nonsmokers)</li>
+<li>\(j\) (1=case, 2=control)</li>
+</ul></li>
+<li>\(\theta_k\) is the corresponding odds ratio
+
+<ul>
+<li>\(a\) is the odds of the disease for the nonsmoking group</li>
+</ul></li>
+<li>Usual noninformative prior can be used for \(a_k, \theta\) and \(\sigma^2_\theta\)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Model formulation in BUGS</h2></hgroup><article  id="model-formulation-in-bugs-2">
+
+<pre class = 'prettyprint lang-r'> for (k in 1:K2){ 
+        for (i in 1:2){ 
+            N[i,k] &lt;- Y[i,1,k]+Y[i,2,k]
+            Y[i,1,k] ~ dbin( p[i,k], N[i,k] )
+            logit(p[i,k]) &lt;- a[k] + theta[K1+k] * equals(i,1)
+        }
+        theta[K1+k] ~ dnorm( mu.theta, tau.theta )
+        OR[K1+k] &lt;- exp(theta[K1+k]) 
+    }</pre>
+
+</article></slide><slide class=''><hgroup><h2>Prior specification</h2></hgroup><article  id="prior-specification">
+
+<pre class = 'prettyprint lang-r'> # priors 
+    for( k in 1:3) { a[k] ~ dnorm( 0.0, 0.001) } 
+    mu.theta  ~ dnorm( 0.0, 0.001)
+    tau.theta ~ dgamma( 0.001, 0.001)
+
+    s2.theta &lt;- 1/tau.theta
+
+    s.theta &lt;- sqrt( s2.theta )
+    OR.total &lt;- exp(mu.theta)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Put everything in a model</h2></hgroup><article  id="put-everything-in-a-model" class="smaller">
+
+<pre class = 'prettyprint lang-r'>model{
+    for (k in 1:K1){ 
+         logor[k] &lt;- log(or[k])
+         selogor[k] &lt;- log(U[k]/L[k])/(2*1.96)
+         precision.logor[k] &lt;- 1/pow(  selogor[k], 2) 
+         logor[k] ~ dnorm( theta[k],  precision.logor[k] ) 
+         theta[k]~dnorm( mu.theta, tau.theta )
+         OR[k] &lt;- exp(theta[k]) 
+    }
+    for (k in 1:K2){ 
+        for (i in 1:2){ 
+            N[i,k] &lt;- Y[i,1,k]+Y[i,2,k]
+            Y[i,1,k] ~ dbin( p[i,k], N[i,k] )
+            logit(p[i,k]) &lt;- a[k] + theta[K1+k] * equals(i,1)
+        }
+        theta[K1+k] ~ dnorm( mu.theta, tau.theta )
+        OR[K1+k] &lt;- exp(theta[K1+k]) 
+    }
+    # priors 
+    for( k in 1:3) { a[k] ~ dnorm( 0.0, 0.001) } 
+    mu.theta  ~ dnorm( 0.0, 0.001)
+    tau.theta ~ dgamma( 0.001, 0.001)
+
+    s2.theta &lt;- 1/tau.theta
+    s.theta &lt;- sqrt( s2.theta )
+    OR.total &lt;- exp(mu.theta)
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Summary sample stats</h2></hgroup><article  id="summary-sample-stats">
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left"></th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">MC_error</th>
+<th align="right">val2.5pc</th>
+<th align="right">median</th>
+<th align="right">val97.5pc</th>
+<th align="right">start</th>
+<th align="right">sample</th>
+</tr>
+<tr class="odd">
+<td align="left">OR.total</td>
+<td align="right">5.98</td>
+<td align="right">1.64</td>
+<td align="right">0.01</td>
+<td align="right">3.51</td>
+<td align="right">5.76</td>
+<td align="right">9.77</td>
+<td align="right">20001</td>
+<td align="right">50000</td>
+</tr>
+<tr class="even">
+<td align="left">mu.theta</td>
+<td align="right">1.75</td>
+<td align="right">0.26</td>
+<td align="right">0.00</td>
+<td align="right">1.26</td>
+<td align="right">1.75</td>
+<td align="right">2.28</td>
+<td align="right">20001</td>
+<td align="right">50000</td>
+</tr>
+<tr class="odd">
+<td align="left">tau.theta</td>
+<td align="right">2.88</td>
+<td align="right">1.72</td>
+<td align="right">0.01</td>
+<td align="right">0.63</td>
+<td align="right">2.52</td>
+<td align="right">7.17</td>
+<td align="right">20001</td>
+<td align="right">50000</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Plot</h2></hgroup><article  id="plot">
+
+<p><img src="main_files/figure-html/unnamed-chunk-15-1.png" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Practical</h2></hgroup><article  id="practical">
+
+<ul>
+<li>Try to run the model in JAGS</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Why use hierarchical model</h2></hgroup><article  id="why-use-hierarchical-model">
+
+<ul>
+<li>Hierarchical models are inherently implied in population-based problems s</li>
+<li>They are widely used in meta-analysis where information from different studies/sources is available</li>
+<li>More generally they describe complex datasets incorporating correlation or including other properties
+
+<ul>
+<li>correlation can be incorporated via a common <em>random effect</em> for all measurements referring to the same individual</li>
+</ul></li>
+<li>Hierarchical model naturally rise when modeling spatio-tempral data in which correlation between time and space can be added by using common random effects on adjacent responses</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Other advantages and characteristics</h2></hgroup><article  id="other-advantages-and-characteristics">
+
+<ul>
+<li>Each parameter referring to a specific group/unit borrows strength from the corresponding parameters of other groups/units
+
+<ul>
+<li>a shrinkage effect towards the population mean is present</li>
+<li>the size of the shrinkage depends on the variance between the random parameters</li>
+</ul></li>
+<li>The prior is decomposed into two parts:
+
+<ul>
+<li>one referring to structural information</li>
+<li>the other one referring to the actual subjective information of the model parameters</li>
+</ul></li>
+<li>The hierarchical structure simplifies both the interpretation and the computation
+
+<ul>
+<li>the posterior distribution is simplified resulting in conditional distributions of simpler form (Gibbs-based sampling schemes)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Getting the slides</h2></hgroup><article  id="getting-the-slides">
+
+<ul>
+<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a>.</li>
+<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a>.</li>
+<li><p>To re-compile the slides:</p>
+
+<ul>
+<li>Download the directory containing the lectures from Github</li>
+<li>In R open the .Rmd file and set the working directory to the lecture directory</li>
+<li>Click the <em>KnitHTML</em> button on Rstudio or run the following commands:</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(rmarkdown) 
+render(&quot;main.Rmd&quot;)</pre></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="main_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="main_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "main_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
