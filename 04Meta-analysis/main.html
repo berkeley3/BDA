@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bayesian Analysis of Medical Data</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="main_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Bayesian Analysis of Medical Data',
+                        subtitle: 'Bayesian Meta-analysis',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                favIcon: 'main_files/logo.jpg',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Paola Berchialla' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(main_files/logo.jpg) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets\css\ioslides.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="main_files/logo.jpg"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<style>
+  .col2 {
+    columns: 2 200px;         /* number of columns and width in pixels*/
+    -webkit-columns: 2 200px; /* chrome, safari */
+    -moz-columns: 2 200px;    /* firefox */
+  }
+  .col3 {
+    columns: 3 100px;
+    -webkit-columns: 3 100px;
+    -moz-columns: 3 100px;
+  }
+</style>
+
+<slide class=''><hgroup><h2>What a meta-analysis is</h2></hgroup><article  id="what-a-meta-analysis-is">
+
+<ul>
+<li><p>Quantitative review and synthesis of results from related butindependent studies</p></li>
+<li>Aggregate data (AD) meta-analysis
+
+<ul>
+<li>Based on summary statistics from each trial</li>
+<li>Mean response, proportion of responders</li>
+<li>Mean difference between groups, odds ratio, hazard ratio</li>
+</ul></li>
+<li>Individual patient data (IPD) meta-analysis
+
+<ul>
+<li>Observed response, time-to-event</li>
+</ul></li>
+<li>If data are collected longitudinally, either approach can be applied at a single time point or as a longitudinal model
+
+<ul>
+<li>IPD is better suited for longitudinal models than AD</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>In contrast: systematic review</h2></hgroup><article  id="in-contrast-systematic-review">
+
+<ul>
+<li><p>A (qualitative) summary of literature related to a specific set of research objectives</p></li>
+<li>Systematic reviews include a quantitative summary of the literature
+
+<ul>
+<li>a meta-analysis</li>
+</ul></li>
+<li><p>Cochrane Collaboration Handbook lists guidelines for performing a systematic review and meta-analysis</p></li>
+<li><p>The PRISMA statement provides standards for reporting systematic review and meta-analyses</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Steps for performing a meta-analysis</h2></hgroup><article  id="steps-for-performing-a-meta-analysis">
+
+<center>
+
+<img src="images/figure_0.png" width="300px" height="500px"/>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Sources of variation</h2></hgroup><article  id="sources-of-variation">
+
+<ul>
+<li>Sampling error
+
+<ul>
+<li>Large studies typically provide more precise estimates than small studies</li>
+</ul></li>
+<li>Study-level characteristics
+
+<ul>
+<li>Will consider these as ways to explain differences in treatment effects across studies through covariates (meta-regression) Inter-study variation</li>
+<li>The remaining, unexplained, variability in treatment effects across studies</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Statistical models</h2></hgroup><article  id="statistical-models">
+
+<ul>
+<li>Fixed effects models
+
+<ul>
+<li>Each study is measuring the same underlying parameter</li>
+<li>There is no inter-study variation in treatment effect (after possibly accounting for covariate effects)</li>
+<li>After accounting for covariates, the only source of variation is sampling error</li>
+</ul></li>
+<li>Random effects models
+
+<ul>
+<li>Each study is associated with a different, but related, underlying parameter</li>
+<li>After accounting for covariates, there is still some unexplained inter-study variability in addition to sampling error</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>5 hypothetical study under fixed and random effects models</h2></hgroup><article  id="hypothetical-study-under-fixed-and-random-effects-models" class="smaller">
+
+<div class="col2">
+<center>
+
+<img src="images/figure_1.png" width="250px" height="300px"/>
+
+</center>
+
+<p>Each study provides an estimate of the common mean effect \((\theta)\). They differ only in how well each study sample estimates \(\theta\)</p>
+
+<center>
+
+<img src="images/figure_2.png" width="250px" height="300px"/>
+
+</center>
+
+<p>Each study-level effect is drawn from a &quot;superpopulation&quot; with mean \(\theta\). Estimates from individual studies are centered around these.</p></div>
+
+</article></slide><slide class=''><hgroup><h2>The simple fixed effects model</h2></hgroup><article  id="the-simple-fixed-effects-model">
+
+<ul>
+<li>Suppose there are r independent studies, each comparing the treatment group with the control group
+
+<ul>
+<li>\(\theta\) denotes the measure of treatment difference</li>
+<li>\(\hat{\theta}_i\) its estimate from the \(i\)-th study</li>
+</ul></li>
+<li><p>The general fixed effects model is \[
+\hat{\theta}_i = \theta + \epsilon_i
+\] with \(E(\epsilon_i)=0\) and \(Var(\epsilon_i)=s_i^2\)</p></li>
+<li><p>Usually \(Var(\epsilon_i)\) is treated as known and equal to the estimated variance of \(\hat{\theta}_i\) \[
+\theta_i \sim N(\theta, s^2_i)
+\]</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Just for fun let&#39;s show the MLE</h2></hgroup><article  id="just-for-fun-lets-show-the-mle" class="smaller">
+
+<ul>
+<li><p>The log likelihood for \(\theta\) is \[
+l(\theta)= \sum_{i=1}^r -\frac{1}{2}\log(s_i^2) - \frac{1}{2}\frac{\left(\hat{\theta}_i - \theta \right)^2}{s_i^2}
+\]</p></li>
+<li><p>Differentiating the log-likelihood with respect to \(\theta\) \[
+\frac{\partial l(\theta)}{\partial\theta} =  \sum_{i=1}^r \frac{\left(\hat{\theta}_i - \theta \right)^2}{s_i^2}
+\]</p></li>
+<li><p>Setting the derivative equal to 0 and solving for \(\theta\) \[
+\sum_{i=1}^r \frac{\hat{\theta}_i}{s_i^2} = \hat{\theta}_{FE} \sum_{i=1}^r \frac{1}{s_i^2} \Longrightarrow \hat{\theta}_{FE} = \frac{\sum_{i=1}^r \frac{\hat{\theta}_i}{s_i^2}}{\sum_{i=1}^r \frac{1}{s_i^2} }
+\]</p></li>
+</ul>
+
+<p>\[
+\hat{\theta}_{FE} = 
+\frac{\sum_{i=1}^r w_i\hat{\theta}_i}{\sum_{i=1}^r w_i} \quad \text{with } w_i = \frac{1}{s_i^2}
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Conjugate Bayesian analysis</h2></hgroup><article  id="conjugate-bayesian-analysis">
+
+<ul>
+<li>If we use a normal prior distribution for \(\theta\) then the posterior distribution for is also a normal distribution \[
+\begin{eqnarray}
+ \theta_i\vert\theta &amp;\sim &amp; N(\theta, s_i^2)\\
+\theta &amp;\sim &amp; N(\mu,\sigma^2)\\
+ &amp; \downarrow &amp; \\
+\theta\vert\text{data}  &amp;\sim &amp; N(\mu_{post},\sigma^2_{post})
+ \end{eqnarray}
+\] where \[
+\begin{eqnarray}
+ \mu_{post} &amp;=&amp; \frac{\sum_{i=1}^r w_i\hat{\theta}_i + \mu/\sigma^2}{\sum_{i=1}^r w_i + \sigma^{-2}}\\
+\sigma^2_{post} &amp;= &amp; \left(\sum_{i=1}^r w_i + \sigma^{-2}\right)^{-1}\\
+\end{eqnarray}
+\]</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Just for fun</h2></hgroup><article  id="just-for-fun">
+
+<ul>
+<li>If the prior distribution is non-informative
+
+<ul>
+<li>\(\sigma^2\) is large relative tu \(\mu\) and \(\sum w_i\)</li>
+<li>\(\mu/\sigma^2 \approx 0\) and \(\sigma^{-2}\approx 0\)</li>
+</ul></li>
+</ul>
+
+<p>\[
+\mu_{post} \approx \hat{\theta}_{FE}
+\]</p>
+
+<p>and</p>
+
+<p>\[
+\sigma^2_{post} \approx \text{Var}(\hat{\theta}_{FE})
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>The simple random effects model</h2></hgroup><article  id="the-simple-random-effects-model">
+
+<p>Let \(\theta\) denotes the measure of treatment difference and \(\hat \theta_i\) its estimate from the \(i-th\) study. Then the general random effects model is \[
+\hat\theta_i = \theta_i + \epsilon_i \qquad \theta_i\sim N(\theta, \tau^2)
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>The Bayesian random effects meta-analysis model</h2></hgroup><article  id="the-bayesian-random-effects-meta-analysis-model">
+
+<ul>
+<li><p>For the Bayesian model, we add one more level to the hierarchical model - prior distributions for \(\theta\) and \(\tau^2\)</p></li>
+<li>The general Bayesian random effects model is
+
+</li>
+</ul>
+
+<p>For example, \(\theta\sim N(\mu, \sigma^2)\) and \(\tau\sim U(0,a)\)</p>
+
+</article></slide><slide class=''><hgroup><h2>Example: comparing 10 mg Atorvastatin to placebo</h2></hgroup><article  id="example-comparing-10-mg-atorvastatin-to-placebo">
+
+<ul>
+<li>Atorvastatin is a member of the drug class known as statins, which are used primarily as a lipid-lowering agent and for prevention of events associated with cardiovascular disease.</li>
+</ul>
+
+<center>
+
+<img src="images/statin.jpg" width="400px" height="300px"/>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Example: 10 mg Atorvastatin vs placebo</h2></hgroup><article  id="example-10-mg-atorvastatin-vs-placebo">
+
+<center>
+
+<img src="images/metanalysis.png" width="400px" height="400px"/>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Example: 10 mg Atorvastatin vs placebo</h2></hgroup><article  id="example-10-mg-atorvastatin-vs-placebo-1">
+
+<ul>
+<li>The variables of interest are ldlPcfb (mean percent change from baseline LDL) and seLdlPcfb (the associated standard error).</li>
+<li>The corresponding sample size in in the variable n.</li>
+<li>Open script atorvastatin.R</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Look at convergence diagnostics</h2></hgroup><article  id="look-at-convergence-diagnostics">
+
+<ul>
+<li><p>Parameter inference from posterior samples is only valid when the MCMC chains, associated with the given parameter of interest, have converged.</p></li>
+<li><p>Gelman and Rubin (1992) provides a detailed discussion on convergence diagnostics.</p></li>
+<li>At least check if the chains are mixing assuming dispersed starting values were used to initialize the chains
+
+<ul>
+<li>using the trace plots</li>
+<li>the Gelman-Rubin diagnostic (Gelman and Rubin 1992).</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Gelman-Rubin diagnostic</h2></hgroup><article  id="gelman-rubin-diagnostic">
+
+<ul>
+<li>Gelman-Rubin diagnostic measures if there is a significant difference between the <em>variance within</em> several chains and the <em>variance between</em> several chains by the potential scale reduction factors.</li>
+<li>Convergence is diagnosed when the chains have <em>forgotten</em> their initial values
+
+<ul>
+<li>the output from all chains is indistinguishable.</li>
+</ul></li>
+<li>It gives the scale reduction factors for each parameter.
+
+<ul>
+<li>A factor of 1 means that <em>between chain variance</em> and <em>within chain variance</em> are equal</li>
+<li>larger values mean that there is still a difference between chains.</li>
+</ul></li>
+<li>A rule of thumb is that values of 1.1 and less suggests adequate convergence.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Help yourself</h2></hgroup><article  id="help-yourself">
+
+<ul>
+<li><p>The dataset <strong>CochranePancreaticData12months.csv</strong> presents 12 month mortality data from 15 controlled clinical comparing gemcitabine+chemotherapy (GC) with gemcitabine (G) with in pancreatic cancer (Yip et al. 2006).</p></li>
+<li>The variables of interest are
+
+<ul>
+<li>d.GC (# deaths on GC) and d.G (# deaths on G)</li>
+<li>N.GC (# randomized to GC) and N.G (# randomized to G). \[
+OR = \frac{d.GC\times (N.G-d.G)}{(N.GC-d.GC)\times d.G}
+\]</li>
+</ul></li>
+</ul>
+
+<p>\[
+\text{Var}(\log OR) = \frac{1}{d.GC} + \frac{1}{N.GC-d.GC} + \frac{1}{d.G} + \frac{1}{N.G-d.G}
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Help yourself</h2></hgroup><article  id="help-yourself-1">
+
+<ol>
+<li>Read the data, derive the log odds ratio comparing GC to G and corresponding standard error.</li>
+<li>Make a forest plot of the log odds ratio values.</li>
+<li>Fit a random effects model</li>
+<li>Using the forest and addpoly functions, make a forest plot overlaying the data and the random effects estimate of the odds ratio.</li>
+</ol>
+
+<p>\[
+OR = \frac{d.GC\times (N.G-d.G)}{(N.GC-d.GC)\times d.G}
+\]</p>
+
+<p>\[
+\text{Var}(\log OR) = \frac{1}{d.GC} + \frac{1}{N.GC-d.GC} + \frac{1}{d.G} + \frac{1}{N.G-d.G}
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>References</h2></hgroup><article  id="references">
+
+<ul>
+<li><p>Borenstein, Hedges, Higgins and Rothstein. Introduction to Meta-Analysis. John Wiley &amp; Sons. 2009.</p></li>
+<li><p>Whitehead A. Meta-Analysis of Controlled Clinical Trials, John Wiley &amp; Sons: West Sussex. 2002.</p></li>
+<li><p>Sharon-Lise T. Normand. Meta-analysis: Formulating, evaluating, combining and reporting. Statistics in Medicine 18, 321-359. 1999</p></li>
+<li><p>Khan KS, Kunz R, Kleijnen J, and Antes G. Five steps to conducting a systematic review. J R Soc Med. 2003 96(3):118-121.</p></li>
+<li><p>Gelman A and Rubin DB. Inference from iterative simulation using multiple sequences. Statistical Science (1992): 457-472.</p></li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="main_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="main_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "main_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
