@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Example of a complete predictive analysis</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="main_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Example of a complete predictive analysis',
+                        subtitle: 'Example of a complete predictive analysis',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: 'main_files/logo.jpg',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Paola Berchialla' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(main_files/logo.jpg) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets\css\ioslides.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="main_files/logo.jpg"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Outline</h2></hgroup><article  id="outline">
+
+<ul>
+<li>Predictive checks in normal ression models</li>
+<li>When fitting normal model, need to check for
+
+<ul>
+<li>the structural assumption of the model (independence, normality, homoscedasticity of errors)</li>
+<li>possible outliers/observations that are rarely observed</li>
+<li>the goodness-of-fit of the model</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Soft drinks data</h2></hgroup><article  id="soft-drinks-data">
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="right">Time</th>
+<th align="right">Cases</th>
+<th align="right">Distance</th>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">7</td>
+<td align="right">560</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="right">3</td>
+<td align="right">220</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="right">3</td>
+<td align="right">340</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">4</td>
+<td align="right">80</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="right">6</td>
+<td align="right">150</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Full model</h2></hgroup><article  id="full-model">
+
+<pre class = 'prettyprint lang-r'>model{
+    # model&#39;s likelihood
+        for (i in 1:n){
+             time[i] ~ dnorm( mu[i], tau ) # stochastic componenent
+             # link and linear predictor
+                 mu[i] &lt;- beta0 + beta1 * cases[i] + beta2 * distance[i]   
+        }
+        # prior distributions
+        tau ~ dgamma( 0.01, 0.01 )
+    beta0 ~ dnorm( 0.0, 1.0E-4)
+    beta1 ~ dnorm( 0.0, 1.0E-4)
+    beta2 ~ dnorm( 0.0, 1.0E-4)
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Full model</h2></hgroup><article  id="full-model-1">
+
+<pre class = 'prettyprint lang-r'>model{
+   [...]
+        # definition of sigma
+        s2&lt;-1/tau
+        s &lt;-sqrt(s2)
+        # calculation of the sample variance
+      for (i in 1:n){ c.time[i]&lt;-time[i]-mean(time[]) } 
+        sy2 &lt;- inprod( c.time[], c.time[] )/(n-1)
+        # calculation of Bayesian version R squared
+        R2B &lt;- 1 - s2/sy2
+        # Expected y for a typical delivery time
+        typical.y &lt;- beta0 + beta1 * mean(cases[]) + beta2 * mean(distance[])
+        #
+        # posterior probabilities of positive beta&#39;s
+        p.beta0 &lt;- step( beta0 )
+        p.beta1 &lt;- step( beta1 )
+        p.beta2 &lt;- step( beta2 )
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Data and Inits</h2></hgroup><article  id="data-and-inits">
+
+<pre class = 'prettyprint lang-r'>data &lt;- list( n=25, 
+      time = c(16.68, 11.5, 12.03, 14.88, 13.75, 18.11,  8, 17.83, 
+               79.24, 21.5, 40.33, 21, 13.5, 19.75, 24, 29, 15.35, 
+               19, 9.5, 35.1, 17.9, 52.32, 18.75, 19.83, 10.75), 
+      distance = c(560, 220, 340, 80, 150, 330, 110, 210, 1460, 
+                   605, 688, 215, 255, 462, 448, 776, 200, 132, 
+                   36, 770, 140, 810, 450, 635, 150), 
+      cases = c( 7, 3, 3, 4, 6, 7, 2, 7, 30, 5, 16, 10, 4, 6, 9, 
+                10, 6, 7, 3, 17, 10, 26, 9, 8, 4) )
+
+inits1 &lt;- list( tau=1, beta0=1, beta1=0, beta2=0 )</pre>
+
+</article></slide><slide class=''><hgroup><h2>Posterior summaries</h2></hgroup><article  id="posterior-summaries" class="smaller">
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left">node</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="left">MC_error</th>
+<th align="right">2.5%</th>
+<th align="right">median</th>
+<th align="right">97.5%</th>
+<th align="right">start</th>
+<th align="right">sample</th>
+</tr>
+<tr class="odd">
+<td align="left">R2B</td>
+<td align="right">0.95110</td>
+<td align="right">0.017430</td>
+<td align="left">5.11E-4</td>
+<td align="right">0.90640</td>
+<td align="right">0.95400</td>
+<td align="right">0.97340</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+<tr class="even">
+<td align="left">beta0</td>
+<td align="right">2.35600</td>
+<td align="right">1.188000</td>
+<td align="left">0.03076</td>
+<td align="right">-0.03996</td>
+<td align="right">2.37200</td>
+<td align="right">4.63500</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+<tr class="odd">
+<td align="left">beta1</td>
+<td align="right">1.61000</td>
+<td align="right">0.180600</td>
+<td align="left">0.003737</td>
+<td align="right">1.27200</td>
+<td align="right">1.60900</td>
+<td align="right">1.96800</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+<tr class="even">
+<td align="left">beta2</td>
+<td align="right">0.01447</td>
+<td align="right">0.003812</td>
+<td align="left">8.47E-5</td>
+<td align="right">0.00680</td>
+<td align="right">0.01446</td>
+<td align="right">0.02211</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+<tr class="odd">
+<td align="left">p.beta0</td>
+<td align="right">0.97400</td>
+<td align="right">0.159100</td>
+<td align="left">0.0040</td>
+<td align="right">0.00000</td>
+<td align="right">1.00000</td>
+<td align="right">1.00000</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+<tr class="even">
+<td align="left">p.beta1</td>
+<td align="right">1.00000</td>
+<td align="right">0.000000</td>
+<td align="left">2.23E-12</td>
+<td align="right">1.00000</td>
+<td align="right">1.00000</td>
+<td align="right">1.00000</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+<tr class="odd">
+<td align="left">p.beta2</td>
+<td align="right">1.00000</td>
+<td align="right">0.000000</td>
+<td align="left">2.23E-12</td>
+<td align="right">1.00000</td>
+<td align="right">1.00000</td>
+<td align="right">1.00000</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+<tr class="even">
+<td align="left">s</td>
+<td align="right">3.38600</td>
+<td align="right">0.569500</td>
+<td align="left">0.0168</td>
+<td align="right">2.53100</td>
+<td align="right">3.30200</td>
+<td align="right">4.74900</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+<tr class="odd">
+<td align="left">typical.y</td>
+<td align="right">22.38000</td>
+<td align="right">0.683000</td>
+<td align="left">0.017</td>
+<td align="right">21.09000</td>
+<td align="right">22.37000</td>
+<td align="right">23.78000</td>
+<td align="right">1001</td>
+<td align="right">2000</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Model summaries</h2></hgroup><article  id="model-summaries">
+
+<ul>
+<li><p>Considering as point estimates the posterior means, the final model is \[
+Y = 2.36 + 1.6\times X_1 + 0.015\times X_2
+\]</p></li>
+<li><p>Minor changes are observed in the regression equation if posterior medians are used as point estimates</p></li>
+<li>Both explanatory variables have an important contribution to the prediction of \(Y\)
+
+<ul>
+<li>all summary statistics and the posterior densities indicate that 0 is far away from the posterior distribution</li>
+<li>posterior probability of having positive association between each \(X_j\) and \(Y\) is equal to 1</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Model summaries</h2></hgroup><article  id="model-summaries-1">
+
+<ul>
+<li>The expected \(Y\) is a posteriori expected to increase by 1.6</li>
+<li>The increase in expected \(Y\) for each additional \(X_1\) lies between 1.3 and 2.0 with probability 95%</li>
+<li>For every increase of \(X_2\) by one unit, \(Y\) is a posteriori expected to increase by 0.015, while every 100 additional units increases by 1.5 the posterior expected \(Y\), ranging between 0.7 and 2.2 with probability 95%.</li>
+<li>Parameter \(\beta_0\) has no sensible interpretation
+
+<ul>
+<li>the posterior probability of positive \(\beta_0\) is equal to 97.4%</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Checking the structural assumptions of the model: independence</h2></hgroup><article  id="checking-the-structural-assumptions-of-the-model-independence">
+
+<ul>
+<li><p>Structural assumptions of the model are the independence of error, normality and homoscedasticity (constant variance across all observations)</p></li>
+<li><p>The independence of error can be checked using the Durbin-Watson statistic</p></li>
+</ul>
+
+<p>\[
+DW(\mathbf y) = \frac{\sum_{i=2}^n (r_i - r_{i-1})}{}
+\]</p>
+
+<p>which is essentially an estimate of the first oder autocorrelation of errors.</p>
+
+</article></slide><slide class=''><hgroup><h2>Checking the structural assumptions of the model: normality</h2></hgroup><article  id="checking-the-structural-assumptions-of-the-model-normality">
+
+<p>Normality can be checked using various version of \(\chi^2\) and the KS statistics</p>
+
+<ul>
+<li><p>Testing for skewness and symmetry of the errors</p></li>
+<li><p>Calculating the number of observations with standardized residual values outside intervals (-2, 2) and (-3, 3) and compared with the 5% and 1% expected under the normality assumption</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Checking the structural assumptions of the model: normality</h2></hgroup><article  id="checking-the-structural-assumptions-of-the-model-normality-1" class="smaller">
+
+<ul>
+<li>Visual evaluation of
+
+<ul>
+<li><p>95% error bars of the cumulative frequencies \(\hat{F}^{rep}\) of replicated/predictive values vs the observed cumulative frequency \(\hat{F}_i\) for each residual value \[
+\hat{F}^{rep} = \frac{1}{n}\sum_{i=k}^n I(r_k^{rep}\leq r_i) \quad \text{and }
+\hat{F}_i = \frac{1}{n}\sum_{i=k}^n I(r_k\leq r_i)
+\]</p></li>
+<li><p>95% error bars of the ordered predictive standardized residual values \(r_{(i)}^{rep}\) vs the poster means of ordered standardized residuals \(r_{(i)}\)</p></li>
+</ul></li>
+<li>These measures focus on different aspects of the fitted distribution and thus may identify different problems concerning the normality of errors</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Checking the structural assumptions of the model: homoscedasticity</h2></hgroup><article  id="checking-the-structural-assumptions-of-the-model-homoscedasticity">
+
+<p>Homoscedasticity of errors can be checked: - dividing the sample into equal part on the basis of covariates or estimated mean in each iteration - computing variances within each subsample - comparing with the overall variance using the Levene test for the equality of variances \[
+W = \frac{(n-K) \sum_{i=1}^n (\bar{Z}_{gi} - \bar Z)^2}{(K-1) \sum_{i=1}^n (\bar{Z}_{i} - \bar Z_{gi})^2} \quad \text{with }  Z_i = \vert r_i - bar{r}_{gi}\vert
+\] where \(r_i = y_i - \mu_i\) is the residual of the \(i\)-observation, \(\bar r_g\) is the mean residual value for the \(g\) group, \(K\) is the number of subsamples, \(\bar Z_g\) is the mean of the \(g\)th subsample and \(g_i\) is the subsample indicator for the \(i\)-observation</p>
+
+</article></slide><slide class=''><hgroup><h2>Checking individual observations using residuals</h2></hgroup><article  id="checking-individual-observations-using-residuals">
+
+<p>Residual values are based on the deviations of the data from the mean of the model \[
+r_i = y_i - E(Y_i\vert\boldsymbol \theta)
+\] and its standardized version got by dividing it by the s.d. under the adopted model \[
+r_i^s = \frac{r_i}{SD(Y_i\vert\boldsymbol\theta)} = \frac{y_i - E(Y_i\vert\boldsymbol \theta)}{\sqrt{\text{Var}(Y-I\vert\boldsymbol\theta)}}
+\]</p>
+
+<ul>
+<li>The tail area probability \[
+p_i^r = P(r_i^{rep} &gt; r_i\vert\mathbf y) =  P(y_i^{rep} &gt; y_i\vert\mathbf y) 
+\]</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Checking individual observations using residuals</h2></hgroup><article  id="checking-individual-observations-using-residuals-1">
+
+<ul>
+<li>The value \[
+min (p_i^r, 1-p_i^r) = min \left\{P(y_i^{rep} &gt; y_i\vert\mathbf y), 1- P(y_i^{rep} &gt; y_i\vert\mathbf y)  \right\}
+\] can be interpreted as the probability of <em>getting a more extreme observation</em></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code">
+
+<pre class = 'prettyprint lang-r'>#[...]
+# residuals
+        for ( i in 1:n ){
+             r[i]     &lt;- (time[i] - mu[i])/s
+             y.rep[i] ~ dnorm( mu[i], tau )
+             r.rep[i] &lt;- (y.rep[i] - mu[i])/s
+         p.r[i]   &lt;- step( time[i]-y.rep[i] )
+         loglike[i] &lt;- -0.5* log( 2*3.14 ) + 0.5*log(tau) -0.5 * pow(r[i],2)
+                 ppo[i]   &lt;- exp(loglike[i])
+                 icpo[i]  &lt;- 1/ppo[i]</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-1" class="smaller">
+
+<pre class = 'prettyprint lang-r'>## [...] #Chi-square statistics
+for (i in 1:n){
+         F2.obs[i] &lt;- rank( r[], i )/n
+         F2.rep[i] &lt;- rank( r.rep[], i )/n
+         F2.exp.obs[i] &lt;- phi( r[i] )
+         F2.exp.rep[i] &lt;- phi( r.rep[i] )
+         chisq.F2.obs.vec[i] &lt;- pow(F2.obs[i]-F2.exp.obs[i],2)/(F2.exp.obs[i]*(1-F2.exp.obs[i]))
+         chisq.F2.rep.vec[i] &lt;- pow(F2.rep[i]-F2.exp.rep[i],2)/(F2.exp.rep[i]*(1-F2.exp.rep[i]))
+     }
+     # chisq values
+     chisq.F2.obs &lt;-  sum( chisq.F2.obs.vec[] )
+     chisq.F2.rep &lt;-  sum( chisq.F2.rep.vec[] )
+     # chisq p-value     
+     chisq.F2.p &lt;- step( chisq.F2.rep - chisq.F2.obs )
+
+     # KS statistic
+          for (i in 1:n){ 
+          F.diff.obs[i] &lt;- abs( F2.obs[i] - F2.exp.obs[i] ) 
+          F.diff.rep[i] &lt;- abs( F2.rep[i] - F2.exp.rep[i] ) 
+     }
+
+     ks.obs &lt;-  ranked(  F.diff.obs[], n )
+     ks.rep &lt;-  ranked(  F.diff.rep[], n )
+     # chisq p-value     
+     ks.p &lt;- step( ks.rep - ks.obs )</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-2" class="smaller">
+
+<pre class = 'prettyprint lang-r'># calculation of observed cumulative frequencies (for actual and replicated data)
+     e &lt;- 0.0001
+     for (i in 1:n){
+          ordered.y[i]     &lt;- ranked( r[], i )
+          ordered.y.rep[i] &lt;- ranked( r.rep[], i )
+     }
+
+     for (i in 1:ncut){
+          for (j in 1:n){
+              bin.freq.obs[i,j] &lt;- step( ycut[i]-ordered.y[j] )  
+              bin.freq.rep[i,j] &lt;- step( ycut[i]-ordered.y.rep[j] )  
+          }
+          F.obs[i] &lt;- sum( bin.freq.obs[i,1:n] )/n
+          F.rep[i] &lt;- sum( bin.freq.rep[i,1:n] )/n
+          F.exp[i] &lt;- phi( ycut[i] )  
+     }
+     #
+     # calculation of frequencies values within interval y_k&#39;, y_{k-1}&#39;  
+     f.exp[1] &lt;- F.exp[1]
+     f.obs[1] &lt;- F.obs[1]
+     f.rep[1] &lt;- F.rep[1]
+     for (i in 2:ncut ){ 
+          f.obs[i] &lt;- F.obs[i]-F.obs[i-1]
+          f.rep[i] &lt;- F.rep[i]-F.rep[i-1]
+          f.exp[i] &lt;- F.exp[i]-F.exp[i-1]
+     }
+     f.obs[ncut+1] &lt;- 1 - F.obs[ncut]
+     f.rep[ncut+1] &lt;- 1 - F.rep[ncut]
+     f.exp[ncut+1] &lt;- 1 - F.exp[ncut]
+     #
+     for (i in 1:(ncut+1)){
+          # setting zero expected frequencies equal to e
+          f.exp2[i] &lt;- f.exp[i] + e*equals(f.exp[i],0)  
+          chisq.f.obs.vec[i] &lt;- pow(f.obs[i]-f.exp2[i],2)/(f.exp2[i]*(1-f.exp2[i]))
+          chisq.f.rep.vec[i] &lt;- pow(f.rep[i]-f.exp2[i],2)/(f.exp2[i]*(1-f.exp2[i]))
+     }
+     # chisq values
+     chisq.f.obs &lt;-  sum( chisq.f.obs.vec[] )
+     chisq.f.rep &lt;-  sum( chisq.f.rep.vec[] )
+     # chisq p-value     
+     chisq.f.p &lt;- step( chisq.f.rep - chisq.f.obs )
+
+     # 1st version of chi^2_F
+
+     for (i in 1:(ncut)){
+          F.exp2[i] &lt;- F.exp[i] + e*equals(F.exp[i],0)  
+          chisq.F.obs.vec[i] &lt;- pow(F.obs[i]-F.exp2[i],2)/(F.exp2[i]*(1-F.exp2[i]))
+          chisq.F.rep.vec[i] &lt;- pow(F.rep[i]-F.exp2[i],2)/(F.exp2[i]*(1-F.exp2[i]))
+     }
+     # chisq values
+     chisq.F.obs &lt;-  sum( chisq.F.obs.vec[] )
+     chisq.F.rep &lt;-  sum( chisq.F.rep.vec[] )
+     # chisq p-value     
+     chisq.F.p &lt;- step( chisq.F.rep - chisq.F.obs )</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-3">
+
+<pre class = 'prettyprint lang-r'> # skewness and kyrtosis
+     for (i in 1:n){
+          m3.obs.vec[i]&lt;- pow( r[i], 3 )
+          m4.obs.vec[i]&lt;- pow( r[i], 4 )
+          m3.rep.vec[i]&lt;- pow( r.rep[i], 3 )
+          m4.rep.vec[i]&lt;- pow( r.rep[i], 4 )
+     }
+     m3.obs &lt;- sum(m3.obs.vec[] )/n   
+     m4.obs &lt;- sum(m4.obs.vec[] )/n-3   
+     m3.rep &lt;- sum(m3.rep.vec[] )/n   
+     m4.rep &lt;- sum(m4.rep.vec[] )/n-3   
+
+     m3.p &lt;- step( m3.rep-m3.obs )
+     m4.p &lt;- step( m4.rep-m4.obs )
+     #</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-4">
+
+<pre class = 'prettyprint lang-r'> # DW statistics
+     dw.vec1[1] &lt;- 0.0
+     dw.vec2[1] &lt;- pow( r[1], 2)
+     dw.rep.vec1[1] &lt;- 0.0
+     dw.rep.vec2[1] &lt;- pow( r.rep[1], 2)
+     
+     for ( i in 2:n){ 
+         dw.vec1[i] &lt;- pow( r[i]-r[i-1], 2)
+         dw.vec2[i] &lt;- pow( r[i], 2)
+         dw.rep.vec1[i] &lt;- pow( r.rep[i]-r.rep[i-1], 2)
+         dw.rep.vec2[i] &lt;- pow( r.rep[i], 2)
+     }
+     dw.obs &lt;- sum( dw.vec1[] )/sum( dw.vec2[] )
+     dw.rep &lt;- sum( dw.rep.vec1[] )/sum( dw.rep.vec2[] )
+     dw.p &lt;- step( dw.rep - dw.obs )
+     # DW statistics</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-5" class="smaller">
+
+<pre class = 'prettyprint lang-r'>   # levene&#39;s test
+     # -------------
+     for (i in 1:n){ 
+         # calculation of the ranks of mu&#39;s
+         ranksmu[i] &lt;- rank( mu[], i ) 
+         # binary indicators for y_i &lt; cut.y[i]+1
+         for (k in 1:K){ group.temp[i,k] &lt;- step(ranksmu[i]-ranksK[k]-1) } 
+         # group indicators for cut.y[i-1] &lt; y_i &lt;= cut.y[i]
+         group[i] &lt;- sum( group.temp[i,1:K] )+1
+         # binary indicators for each group
+         for (k in 1:K){ group.index[i,k] &lt;- equals( group[i], k ) } 
+     }
+     # calculation of group means for y and y.rep
+     for (k in 1:K){ 
+          barr.obs[k] &lt;- inprod( r[],  group.index[1:n,k] )/ sum(group.index[1:n,k])
+          barr.rep[k] &lt;- inprod( r.rep[], group.index[1:n,k] )/ sum(group.index[1:n,k])
+     }
+     # calculation of z[i] for y and y.rep
+         for (i in 1:n){ 
+                    z.obs[i] &lt;- abs( r[i]     - barr.obs[ group[i] ] )
+                    z.rep[i] &lt;- abs( r.rep[i] - barr.rep[ group[i] ] )
+         }
+     # calculation of group means for z.obs and z.rep
+     for (k in 1:K){ 
+          barz.obs[k] &lt;- inprod( z.obs[],  group.index[1:n,k] )/ sum(group.index[1:n,k])
+          barz.rep[k] &lt;- inprod( z.rep[],  group.index[1:n,k] )/ sum(group.index[1:n,k])
+     }</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-6">
+
+<pre class = 'prettyprint lang-r'> # overall means for z&#39;s
+     grandmean.obs &lt;- mean(z.obs[])
+     grandmean.rep &lt;- mean(z.rep[])
+
+     for (i in 1:n){ 
+          lev.obs.vec1[i] &lt;- pow(barz.obs[ group[i] ] - grandmean.obs ,2)
+          lev.rep.vec1[i] &lt;- pow(barz.rep[ group[i] ] - grandmean.rep ,2)
+          lev.obs.vec2[i] &lt;- pow(z.obs[i] - barz.obs[ group[i] ], 2)
+          lev.rep.vec2[i] &lt;- pow(z.rep[i] - barz.rep[ group[i] ], 2)
+     }
+     levenes.obs &lt;- (n-K)* sum(lev.obs.vec1[])/( (K-1)*sum(lev.obs.vec2[]) )
+     levenes.rep &lt;- (n-K)* sum(lev.rep.vec1[])/( (K-1)*sum(lev.rep.vec2[]) )
+     levenes.p &lt;- step(levenes.rep-levenes.obs)</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-7">
+
+<pre class = 'prettyprint lang-r'> # R^2
+     sy2 &lt;- pow(sd(time[]),2)
+     RB2adj &lt;- 1 - s2/sy2
+     RB2    &lt;- 1 - (n-p-1)*s2/((n-1)*sy2)</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-8">
+
+<pre class = 'prettyprint lang-r'> # percentage of stand. residuals outside (-2,2) and (-3,3)
+        for (i in 1:n){
+             p95.vec[i] &lt;-step(r[i]-2)+step(-2-r[i])
+             p99.vec[i] &lt;-step(r[i]-3)+step(-3-r[i])
+             p95.rep.vec[i] &lt;-step(r.rep[i]-2)+step(-2-r.rep[i])
+             p99.rep.vec[i] &lt;-step(r.rep[i]-3)+step(-3-r.rep[i])
+        }
+        p95.obs &lt;- mean(p95.vec[])
+        p99.obs &lt;- mean(p99.vec[])
+        p95.rep &lt;- mean(p95.rep.vec[])
+        p99.rep &lt;- mean(p99.rep.vec[])
+        #       
+        p95.p &lt;- step(p95.rep-p95.obs)
+        p99.p &lt;- step(p99.rep-p99.obs)</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-9">
+
+<pre class = 'prettyprint lang-r'># observed and predictive ordered residuals
+        for (i in 1:n){
+         ordered.r[i]     &lt;- ranked( r[]    , i )
+                 ordered.r.rep[i] &lt;- ranked( r.rep[]    , i )
+        }</pre>
+
+</article></slide><slide class=''><hgroup><h2>BUGS code</h2></hgroup><article  id="bugs-code-10">
+
+<pre class = 'prettyprint lang-r'># observed and predictive cummulative frequencies
+        #
+    # predictive cummulative frequencies for each y_i
+    for (i in 1:n){
+       for (k in 1:n){
+              pred.lower.yi[i,k] &lt;- step( r[i] - r.rep[k] )
+        }
+        Freq.rep[i] &lt;- sum( pred.lower.yi[i,1:n] )/n
+        Freq.obs [i] &lt;- rank( r[], i )/n 
+    }</pre>
+
+</article></slide><slide class=''><hgroup><h2>Posterior p-values</h2></hgroup><article  id="posterior-p-values">
+
+<center>
+
+<img src="images/figure1.png" width=600 height=300>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>95% posterior bars of odered predictive standardized residuals (actual vs replicated)</h2></hgroup><article  id="posterior-bars-of-odered-predictive-standardized-residuals-actual-vs-replicated">
+
+<center>
+
+<img src="images/figure2.png" width=600 height=300>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>95% posterior bars of cumulative frequencies (actual vs replicated)</h2></hgroup><article  id="posterior-bars-of-cumulative-frequencies-actual-vs-replicated">
+
+<center>
+
+<img src="images/figure3.png" width=600 height=300>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Proportion of residuals outside (-2,2) and (-3,3)</h2></hgroup><article  id="proportion-of-residuals-outside--22-and--33">
+
+<center>
+
+<img src="images/figure4.png" width=600 height=200>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>95% posterior bars of standardized residuals vs (a) observation index (b) posterior mean of \(\mu_i\)</h2></hgroup><article  id="posterior-bars-of-standardized-residuals-vs-a-observation-index-b-posterior-mean-of-mu_i">
+
+<center>
+
+<img src="images/figure5.png" width=800 height=300>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Individual residual statistics</h2></hgroup><article  id="individual-residual-statistics">
+
+<center>
+
+<img src="images/figure6.png" width=800 height=400>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Summary of model checking procedure</h2></hgroup><article  id="summary-of-model-checking-procedure">
+
+<ul>
+<li>Select appropriate measures and check the structural assumptions of the model</li>
+<li>Perform outlier analysis using residual checks and examine extreme PPOs and CPOs</li>
+<li>Check the overall goodness-of-fit of the model using an appropriate measure</li>
+<li>Revise the model if checks 1-3 indicate that the model is not valid
+
+<ul>
+<li>rerun points 1-3</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>References</h2></hgroup><article  id="references">
+
+<ul>
+<li><p>Gelman A, Meng XL, Stern H (1996). Posterior predictive assessment of model fitness via realized discrepancies. <em>Statistica Sinica</em> <strong>6</strong>, 733-807</p></li>
+<li><p>Meng XL (1994). Posterior predictive p-values. <em>Annals of Statistics</em> <strong>22</strong>, 1142-1160.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Getting the slides</h2></hgroup><article  id="getting-the-slides">
+
+<ul>
+<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a>.</li>
+<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a>.</li>
+<li><p>To re-compile the slides:</p>
+
+<ul>
+<li>Download the directory containing the lectures from Github</li>
+<li>In R open the .Rmd file and set the working directory to the lecture directory</li>
+<li>Click the <em>KnitHTML</em> button on Rstudio or run the following commands:</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(rmarkdown) 
+render(&quot;main.Rmd&quot;)</pre></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="main_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="main_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "main_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
