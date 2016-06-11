@@ -1,5 +1,5 @@
 ---
-title: "Bayesian Analysis of Medical Data"
+title: "Bayesian Data Analysis for Medical Data"
 subtitle: Bayesian Meta-analysis
 author      : Paola Berchialla
 job         : Department of Clinical and Biological Sciences, University of Torino
