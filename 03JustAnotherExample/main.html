@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bayesian Data Analysis for Medical Data</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="main_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Bayesian Data Analysis for Medical Data',
+                        subtitle: 'Just Another Example of Hierarchical Modeling',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: 'main_files/logo.jpg',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Paola Berchialla' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(main_files/logo.jpg) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets\css\ioslides.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="main_files/logo.jpg"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Just Another Example: a simple crossover trial</h2></hgroup><article  id="just-another-example-a-simple-crossover-trial">
+
+<ul>
+<li><strong>Crossover trial:</strong> different treatments are given with different sequences in groups of patients</li>
+</ul>
+
+<center>
+
+<img src="images/Crossover.png" width="800px" height="400px"/>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Brown&amp;Prescott (Applied Mixed Models in Medicine, 2006)</h2></hgroup><article  id="brownprescott-applied-mixed-models-in-medicine-2006" class="smaller">
+
+<ul>
+<li>Comparison of two diuretics in the treatment of mild and moderate heart failure</li>
+<li>Baseline observation were taken before the first treatment period</li>
+<li>The duration of each treatment period was 5 days without any washout period
+
+<ul>
+<li>to avoid carryover effects, measurement of the first 2 days were ignored</li>
+</ul></li>
+<li>Two endpoint analyzed:
+
+<ul>
+<li>edema status (OED)
+
+<ul>
+<li>the sum of left and right ankle diameters</li>
+</ul></li>
+<li>diastolic blood preassure (DBP)
+
+<ul>
+<li>the sum of 3 DBP readings</li>
+</ul></li>
+</ul></li>
+<li><strong>Aim: compare the effectiveness of the two treatments</strong></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Brown&amp;Prescott (Applied Mixed Models in Medicine, 2006)</h2></hgroup><article  id="brownprescott-applied-mixed-models-in-medicine-2006-1">
+
+<pre >## &lt;!-- html table generated in R 3.2.5 by xtable 1.8-2 package --&gt;
+## &lt;!-- Sat Jun 11 18:42:54 2016 --&gt;
+## &lt;table border=0&gt;
+## &lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; ID &lt;/th&gt; &lt;th&gt; Treatment &lt;/th&gt; &lt;th&gt; Period &lt;/th&gt; &lt;th&gt; OED_base &lt;/th&gt; &lt;th&gt; DBP_base &lt;/th&gt; &lt;th&gt; OED &lt;/th&gt; &lt;th&gt; DBP &lt;/th&gt;  &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 101 &lt;/td&gt; &lt;td&gt; B &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 45 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 180 &lt;/td&gt; &lt;td&gt; 45 &lt;/td&gt; &lt;td&gt; 165 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 2 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 101 &lt;/td&gt; &lt;td&gt; A &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 2 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 45 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 180 &lt;/td&gt; &lt;td&gt; 45 &lt;/td&gt; &lt;td&gt; 180 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 3 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 102 &lt;/td&gt; &lt;td&gt; A &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 51 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 150 &lt;/td&gt; &lt;td&gt; 48 &lt;/td&gt; &lt;td&gt; 180 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 4 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 102 &lt;/td&gt; &lt;td&gt; B &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 2 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 51 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 150 &lt;/td&gt; &lt;td&gt; 48 &lt;/td&gt; &lt;td&gt; 195 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 5 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 103 &lt;/td&gt; &lt;td&gt; A &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 53 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 210 &lt;/td&gt; &lt;td&gt; 50 &lt;/td&gt; &lt;td&gt; 210 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 6 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 103 &lt;/td&gt; &lt;td&gt; B &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 2 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 53 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 210 &lt;/td&gt; &lt;td&gt; 52 &lt;/td&gt; &lt;td&gt; 240 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 7 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 104 &lt;/td&gt; &lt;td&gt; B &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 49 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 205 &lt;/td&gt; &lt;td&gt; 47 &lt;/td&gt; &lt;td&gt; 180 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 8 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 104 &lt;/td&gt; &lt;td&gt; A &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 2 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 49 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 205 &lt;/td&gt; &lt;td&gt; 47 &lt;/td&gt; &lt;td&gt; 180 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 9 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 105 &lt;/td&gt; &lt;td&gt; A &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 46 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 195 &lt;/td&gt; &lt;td&gt; 45 &lt;/td&gt; &lt;td&gt; 180 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 10 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 201 &lt;/td&gt; &lt;td&gt; A &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 61 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 286 &lt;/td&gt; &lt;td&gt; 60 &lt;/td&gt; &lt;td&gt; 284 &lt;/td&gt; &lt;/tr&gt;
+##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 11 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 201 &lt;/td&gt; &lt;td&gt; B &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 2 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 61 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 286 &lt;/td&gt; &lt;td&gt; 59 &lt;/td&gt; &lt;td&gt; 290 &lt;/td&gt; &lt;/tr&gt;
+##    &lt;/table&gt;</pre>
+
+</article></slide><slide class=''><hgroup><h2>Brown&amp;Prescott (Applied Mixed Models in Medicine, 2006)</h2></hgroup><article  id="brownprescott-applied-mixed-models-in-medicine-2006-2">
+
+<p>Four models were fitted for each response (OED and DBP) and compared using DIC:</p>
+
+<ul>
+<li>treatment and period effect were included in the analysis as fixed effects</li>
+<li>patient effect was included as either fixed or random effect</li>
+<li>baseline measures were introduced in two models to assess their importance</li>
+<li>an additional model with interaction effect between the period and the treatment to account for possible <em>carryover</em> effects</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Models formulation</h2></hgroup><article  id="models-formulation">
+
+<p>\[
+\begin{eqnarray}
+Y_i &amp; \sim &amp; N(\mu_i, \sigma^2) \\
+\mu_i &amp; = &amp; \beta_1 + \beta_2\text{period}_i + \beta_3 T_i + \gamma_1 a^{\text{random}}_{P_i} + (1-\gamma_1) a^{\text{fixed}}_{P_i} + \gamma_2 \beta_4 B_i \\
+a^{\text{random}}_{k} &amp; \sim &amp; N(0,\sigma^2_{\text{patients})
+a^{\text{fixed}}_{k} &amp; \sim &amp; N(0,10^{-3})
+\end{eqnarray}
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Model 1: fixed effects + no baseline</h2></hgroup><article  id="model-1-fixed-effects-no-baseline" class="smaller">
+
+<pre class = 'prettyprint lang-r'>library(BRugs)
+
+### specify model------------
+modelstring=&quot;
+model
+{
+  for (i in 1:N){
+            # --------------------
+  # model for oed
+  # --------------------
+  oed[i]~dnorm( mu.oed[i], tau.oed[1])
+  mu.oed[i] &lt;- b.oed[1] + b.oed[2] *(period[i]-1)+ b.oed[3] *(treatment[i]-1) + a.oed.fixed[ patient[i] ] 
+  # --------------------
+  # model for dbp
+  # --------------------
+  dbp[i]~dnorm( mu.dbp[i], tau.dbp[1])
+  mu.dbp[i] &lt;- b.dbp[1] + b.dbp[2] *(period[i]-1)+ b.dbp[3] *(treatment[i]-1) + a.dbp.fixed[ patient[i] ] 
+  }
+  for (i in 1:n){ 
+  # [...]&quot;</pre>
+
+</article></slide><slide class=''><hgroup><h2>Model 1: fixed effects + no baseline</h2></hgroup><article  id="model-1-fixed-effects-no-baseline-1" class="smaller">
+
+<pre class = 'prettyprint lang-r'>library(BRugs)
+
+### specify model------------
+[...]
+  # 
+  # Non-informative priors for individual/patients fixed effects        
+  a.oed.fixed[i]~dnorm( 0.0, 0.001)
+  a.dbp.fixed[i]~dnorm( 0.0, 0.001)
+  }
+  for (i in 1:p){
+  b.oed[i]~dnorm( 0.0, 0.001)
+  b.dbp[i]~dnorm( 0.0, 0.001)
+  }
+  tau.oed[1]~dgamma( 0.001,0.001)
+  tau.dbp[1]~dgamma( 0.001,0.001)
+  #
+  #
+  s2[1]&lt;-1/tau.oed[1]
+  s2[2]&lt;-1/tau.dbp[1]
+  
+  for( i in 1:N ){
+  res1[i] &lt;- oed[i] - mu.oed[i]
+  res2[i] &lt;- dbp[i] - mu.dbp[i]
+  }
+  R[1] &lt;- 1 - pow( sd(res1[1:N])/sd(oed[1:N]), 2)
+  R[2] &lt;- 1 - pow( sd(res2[1:N])/sd(dbp[1:N]), 2)
+  
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Model 1: fixed effects + no baseline</h2></hgroup><article  id="model-1-fixed-effects-no-baseline-2" class="smaller">
+
+<pre class = 'prettyprint lang-r'>datalist &lt;- list(N=nrow(crossover),
+                 n = unique(length(crossover$patient)),
+                 p = 3,
+                 oed = crossover$oed,
+                 dbp = crossover$dbp,
+                 period = crossover$period,
+                 treatment = crossover$treatment,
+                 patient = crossover$patient)
+
+
+modelData(bugsData( datalist))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Model 1: fixed effects + no baseline</h2></hgroup><article  id="model-1-fixed-effects-no-baseline-3" class="smaller">
+
+<pre class = 'prettyprint lang-r'># compile model----
+modelCompile()
+
+#inits-------------
+inits1 = list( b.oed=c(0,0,0), b.dbp=c(0,0,0), tau.oed=1, tau.dbp=1)
+BRugs::bugsInits(list(inits1), numChains=1, fileName=&#39;inits1.txt&#39;)
+modelInits(&#39;inits1.txt&#39;)
+modelGenInits()
+
+# bur-in------
+modelUpdate(20000)     
+
+# set parameters----
+parameters &lt;- c(&#39;tau.oed&#39;, &#39;tau.dbp&#39;, &#39;b.oed&#39;,&#39;b.dbp&#39;)
+samplesSet(parameters)     
+dicSet()
+
+# model update--------
+modelUpdate(50000)     </pre>
+
+</article></slide><slide class=''><hgroup><h2>Model 2: random effects + no baseline</h2></hgroup><article  id="model-2-random-effects-no-baseline" class="smaller">
+
+<ul>
+<li>Model2.R</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Model 3: fixed effects + baseline</h2></hgroup><article  id="model-3-fixed-effects-baseline" class="smaller">
+
+<ul>
+<li>Model3.R</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Model 4: random effects + baseline</h2></hgroup><article  id="model-4-random-effects-baseline" class="smaller">
+
+<ul>
+<li>Model4.R</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>DIC to choose models</h2></hgroup><article  id="dic-to-choose-models">
+
+<center>
+
+<img src="images/dic.png" width="400px" height="200px" />
+
+</center>
+
+<ul>
+<li>To check for deviations from the normality assumption, the log-normal distribution can be used (higher DIC values)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Final Model</h2></hgroup><article  id="final-model">
+
+<center>
+
+<img src="images/Model4.png" width="600px" height="400px" />
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Stan</h2></hgroup><article  id="stan">
+
+<pre class = 'prettyprint lang-r'>library(rstanarm)
+
+data &lt;- read.csv(&#39;R\\crossover.base.csv&#39;)
+data$period &lt;- data$period-1
+data$treatment &lt;- data$treatment-1
+
+post2 &lt;- stan_lmer(oed ~ period + treatment + oedbase+ (1|patient), data=data)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Stan</h2></hgroup><article  id="stan-1">
+
+<pre class = 'prettyprint lang-r'>pp_check(post1)</pre>
+
+<center>
+
+<img src="images/pp_check.png" width="600px" height="400px" />
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Stan</h2></hgroup><article  id="stan-2">
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+
+base &lt;- ggplot(data, aes(x = treatment, y = oed)) +
+  geom_point(size=1, position=position_jitter(height = 0.05, width = 0.1)) +
+  scale_x_continuous(breaks = c(1,2), labels = c(&#39;A&#39;, &#39;B&#39;)) 
+
+draws &lt;- as.data.frame(post2)[,1:3]
+draws &lt;- na.omit(draws)
+colnames(draws)[1] =&#39;intercept&#39;
+base + 
+  geom_abline(data = draws, aes(intercept = intercept +mean(data$oedbase), slope = treatment),
+              color = &#39;skyblue&#39;, size = 0.2, alpha = 0.25) +
+  geom_abline(intercept = fixef(post2)[1] + mean(data$oedbase), slope = fixef(post2)[3],
+              color = &#39;skyblue4&#39;, size = 1)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Stan</h2></hgroup><article  id="stan-3">
+
+<center>
+
+<img src="images/stan1.png" width="600px" height="400px" />
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Stan: relationship with baseline</h2></hgroup><article  id="stan-relationship-with-baseline">
+
+<pre class = 'prettyprint lang-r'>draws &lt;- as.data.frame(as.matrix(post2))
+colnames(draws)[1] &lt;- &quot;intercept&quot;
+ggplot(data, aes(x = oedbase, y = oed)) + 
+  geom_point(size = 1) +
+  geom_abline(data = draws, aes(intercept = intercept, slope = oedbase), 
+              color = &quot;skyblue&quot;, size = 0.2, alpha = 0.25) + 
+  geom_abline(intercept = fixef(post2)[1], slope = fixef(post2)[4], 
+              color = &quot;skyblue4&quot;, size = 1)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Stan: relationship with baseline</h2></hgroup><article  id="stan-relationship-with-baseline-1">
+
+<center>
+
+<img src="images/stan2.png" width="600px" height="400px" />
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>The carry-over effect?</h2></hgroup><article  id="the-carry-over-effect">
+
+<ul>
+<li><p>Try to add an interaction term between the period and the treatment</p></li>
+<li><p>It is worth modeling the carry-over effect?</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Getting the slides</h2></hgroup><article  id="getting-the-slides">
+
+<ul>
+<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a>.</li>
+<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a>.</li>
+<li><p>To re-compile the slides:</p>
+
+<ul>
+<li>Download the directory containing the lectures from Github</li>
+<li>In R open the .Rmd file and set the working directory to the lecture directory</li>
+<li>Click the <em>KnitHTML</em> button on Rstudio or run the following commands:</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(rmarkdown) 
+render(&quot;main.Rmd&quot;)</pre></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="main_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="main_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "main_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

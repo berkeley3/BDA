@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                favIcon: 'main_files/logo.jpg',
+                        favIcon: 'main_files/logo.jpg',
               },
 
       // Author information
@@ -414,7 +414,24 @@ OR = \frac{d.GC\times (N.G-d.G)}{(N.GC-d.GC)\times d.G}
 <li><p>Sharon-Lise T. Normand. Meta-analysis: Formulating, evaluating, combining and reporting. Statistics in Medicine 18, 321-359. 1999</p></li>
 <li><p>Khan KS, Kunz R, Kleijnen J, and Antes G. Five steps to conducting a systematic review. J R Soc Med. 2003 96(3):118-121.</p></li>
 <li><p>Gelman A and Rubin DB. Inference from iterative simulation using multiple sequences. Statistical Science (1992): 457-472.</p></li>
-</ul></article></slide>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Getting the slides</h2></hgroup><article  id="getting-the-slides">
+
+<ul>
+<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a>.</li>
+<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a>.</li>
+<li><p>To re-compile the slides:</p>
+
+<ul>
+<li>Download the directory containing the lectures from Github</li>
+<li>In R open the .Rmd file and set the working directory to the lecture directory</li>
+<li>Click the <em>KnitHTML</em> button on Rstudio or run the following commands:</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(rmarkdown) 
+render(&quot;main.Rmd&quot;)</pre></article></slide>
 
 
   <slide class="backdrop"></slide>
