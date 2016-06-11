@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>The Predictive Distribution and Model Checking</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="main_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'The Predictive Distribution and Model Checking',
+                        subtitle: 'subtitle',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: 'main_files/logo.jpg',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Paola Berchialla' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(main_files/logo.jpg) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets\css\ioslides.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="main_files/logo.jpg"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Predictive distributions</h2></hgroup><article  id="predictive-distributions">
+
+<ul>
+<li>Predictions of future observables are based on <em>predictive distributions</em>
+
+<ul>
+<li>the distribution of the data averaged over all possible parameter values</li>
+</ul></li>
+<li><p><strong>Prior predictive distribution</strong> \[
+f(\mathbf y) = \int f(\mathbf y \vert \boldsymbol{\theta}) f(\boldsymbol{\theta}) d\boldsymbol{\theta}
+\]</p></li>
+<li><p><strong>(Posterior) predictive distribution</strong></p></li>
+</ul>
+
+<p>\[
+f(\mathbf y&#39;\vert \mathbf y) = \int f(\mathbf y&#39; \vert \boldsymbol{\theta}) f(\boldsymbol{\theta}\vert\mathbf y) d\boldsymbol{\theta}
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Using predictive distribution for model evaluation</h2></hgroup><article  id="using-predictive-distribution-for-model-evaluation">
+
+<ul>
+<li>The predictive distribution \(f(\mathbf y&#39;\vert\mathbf, m)\) of a model \(m\) is used for checking model assumptions and goodness-of-fit
+
+<ul>
+<li>replicated \(\mathbf y^{rep}\) can be easily generate</li>
+<li>add a single step within any MCMC sampler using \(f\left( y^{rep}\vert \boldsymbol{\theta}^{(t)}\right)\)</li>
+<li>\(\boldsymbol{\theta}^{(t)}\): the parameter values of the current state of the algorithm</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Predictive data</h2></hgroup><article  id="predictive-data">
+
+<ul>
+<li>The predictive data \(\mathbf y^{rep}\) reflect the expected observations after replicating the study:
+
+<ul>
+<li>having already observed \(\mathbf y\)</li>
+<li>assuming the model adopted is true</li>
+</ul></li>
+<li>Comparison can be made using summary functions \(D(\mathbf y, \boldsymbol{\theta})\)
+
+<ul>
+<li><p>test statistics for checking the assumptions and measure discrepancies between data and model (Gelman, 1996)</p></li>
+<li><p><em>Posterior predictive p-values (PPP)</em> (Meng 1994) \[
+P\left(D(\mathbf y^{\text{rep}}, \boldsymbol{\theta}) &gt; D(\mathbf y, \boldsymbol{\theta}) \vert \mathbf y \right)
+\]</p></li>
+</ul></li>
+<li>Values of PPP around 0.5 indicate the distributions of replicated and actual data are close</li>
+<li>Values of PPP close to 0 indicate differences the distributions of replicated and actual data</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Beware</h2></hgroup><article  id="beware">
+
+<ul>
+<li>In model checks, data are used twice:
+
+<ul>
+<li>1st: estimation of the posterior predictive density</li>
+<li>2nd: comparison between the predictive density and the data</li>
+</ul></li>
+<li><strong>Violation of the likelihood principle</strong>
+
+<ul>
+<li>not entirely a violation if the posterior predictive checks are used only as measure of discrepancy between the model and the data to identify poorly fitted models and not for model comparison and inference</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Model checks</h2></hgroup><article  id="model-checks">
+
+<p>Model checks can be divided into:</p>
+
+<ul>
+<li>individual checks
+
+<ul>
+<li>based on each \(y_i\) and \(y^{rep}_i\) separately to trace outliers or surprising observations (under the assumed model)</li>
+</ul></li>
+<li>overall predictive diagnostics to check general assumptions of the model:
+
+<ul>
+<li>normality, goodness-of-fit</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Steps for posterior predictive checks</h2></hgroup><article  id="steps-for-posterior-predictive-checks">
+
+<ul>
+<li><p>Plot and compare the frequency tabulations of \(\mathbf y^{\text{rep}}\) and \(\mathbf y\) for discrete data</p></li>
+<li><p>Plot and compare the cumulative frequencies of \(\mathbf y^{\text{rep}}\) and \(\mathbf y\) for continuous data</p></li>
+<li><p>Plot and compare ordered data \(\left(y_{(1)}^{\text{rep}}, \ldots, y_{(n)}^{\text{rep}} \right)\) and \(\left(y_{(1)}, \ldots, y_{(n)} \right)\) for continuous data</p></li>
+<li><p>Plot estimated posterior predictive ordinate \(f(y_i\vert\mathbf y)\) against \(y_i\) to trace surprising values</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Steps for posterior predictive checks</h2></hgroup><article  id="steps-for-posterior-predictive-checks-1">
+
+<ul>
+<li>The posterior predictive ordinate \[
+PPO_i = f(y_i\vert\mathbf y) = \int f(y_i\vert\boldsymbol{\theta}) f(\boldsymbol{\theta}\vert\mathbf y) d\boldsymbol{\theta}
+\] provides the probability of observing \(y_i\) after having observed \(\mathbf y\)
+
+<ul>
+<li>small values indicate observations originating from the tail</li>
+<li>extremely small values indicate potential outliers</li>
+<li>a large amount of \(y_i\) with small PPO may indicate a poorly fitted model</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Steps for posterior predictive checks</h2></hgroup><article  id="steps-for-posterior-predictive-checks-2">
+
+<ul>
+<li>Use test statistics and posterior p-values to quantify differences concerning
+
+<ul>
+<li>outliers: individual test statistics on the basis of residual values</li>
+<li>structural assumptions of the model: global test statistics, i.e. comparing the skewness and the kurtosis of \(\mathbf y^{\text{rep}}\) with the corresponding observed measures</li>
+<li>fitness of the model: usual measure such as \(\chi^2\)</li>
+</ul></li>
+</ul>
+
+<p>\[
+\chi^2(\mathbf y, \boldsymbol{\theta}) = \sum_{i=1}^n \frac{[y_i - E(Y_i\boldsymbol{\theta})]^2}{\text{Var} E(Y_i\boldsymbol{\theta})}
+\] and deviance \[
+Deviance(\mathbf y, \boldsymbol{\theta}) = -2 \sum_{i=1}^n \text{log} f(y_i\vert\boldsymbol{\theta})
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>References</h2></hgroup><article  id="references">
+
+<ul>
+<li><p>Gelman A, Meng XL, Stern H (1996). Posterior predictive assessment of model fitness via realized discrepancies. <em>Statistica Sinica</em> <strong>6</strong>, 733-807</p></li>
+<li><p>Meng XL (1994). Posterior predictive p-values. <em>Annals of Statistics</em> <strong>22</strong>, 1142-1160</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Getting the slides</h2></hgroup><article  id="getting-the-slides">
+
+<ul>
+<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a>.</li>
+<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a>.</li>
+<li><p>To re-compile the slides:</p>
+
+<ul>
+<li>Download the directory containing the lectures from Github</li>
+<li>In R open the .Rmd file and set the working directory to the lecture directory</li>
+<li>Click the <em>KnitHTML</em> button on Rstudio or run the following commands:</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(rmarkdown) 
+render(&quot;main.Rmd&quot;)</pre></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="main_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="main_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "main_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
