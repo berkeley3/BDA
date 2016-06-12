@@ -38,6 +38,7 @@ No specific mathematical expertise is required. Some familiarity with statistica
 - Although it is not required, it is recommend installing RStudio https://www.rstudio.com
 
 - R packages BRugs, R2OpenBUGS, rjags, rstanarm are also required
+- Other R packages that will be used: knitr, xtable, plotrix, ggplot2, metafor, maptools, sp, spdep, RColorBrewer, classInt
  
 ### Contributors
 
