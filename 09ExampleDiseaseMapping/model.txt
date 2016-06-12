@@ -1,0 +1,17 @@
+model
+{
+    for (i in 1:N) {
+        O[i] ~ dpois(mu[i])
+        mu[i] <- theta[i] * E[i]
+        log(theta[i]) <- alpha + u[i] + v[i]
+        u[i] ~ dnorm(0.00000E+00, precu)
+        SMR[i] <- O[i]/E[i]
+        prob[i] <- step(theta[i] - 1)
+    }
+    v[1:N] ~ car.normal(adj[], weights[], num[], precv)
+    precu ~ dgamma(0.001, 0.001)
+    precv ~ dgamma(0.001, 0.001)
+    alpha ~ dflat()
+    sigmau <- 1/precu
+    sigmav <- 1/precv
+}

@@ -34,14 +34,14 @@ vcWBweights=nb2WB(vcnb)
 
 ## define and run model------
 d=list(O=vcmap$OSS,E=vcmap$ATT, N=86)
-inits1=list(u=rep(0,86),v=rep(0,86),precu=1,precv=1)
+inits1=list(u=rep(0,86),v=rep(0,86),precu=1,precv=1, alpha=0.5)
 #inits2=list(u=rep(1,86),v=rep(1,86),precu=0.1,precv=0.1)
 
 model=function() {
   for(i in 1:N){
     O[i]~dpois(mu[i])
     mu[i]<-theta[i]*E[i]
-    log(theta[i])<- u[i]+v[i]
+    log(theta[i])<- alpha+u[i]+v[i]
     u[i]~dnorm(0,precu)
     SMR[i]<-O[i]/E[i]
     prob[i]<-step(theta[i]-1)
@@ -49,6 +49,7 @@ model=function() {
   v[1:N]~car.normal(adj[],weights[],num[],precv)
   precu~dgamma(0.001,0.001)
   precv~dgamma(0.001,0.001)
+  alpha ~ dflat()
   sigmau<-1/precu
   sigmav<-1/precv
 }
