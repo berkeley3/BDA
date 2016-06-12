@@ -153,7 +153,7 @@ modelData(bugsData( datalist))
 modelCompile()
 
 #inits-------------
-inits1 = list( b.oed=c(0,0,0), b.dbp=c(0,0,0), tau.oed=1, tau.dbp=1)
+inits1 <- list( b.oed=c(0,0,0), b.dbp=c(0,0,0), tau.oed=1, tau.dbp=1)
 BRugs::bugsInits(list(inits1), numChains=1, fileName='inits1.txt')
 modelInits('inits1.txt')
 modelGenInits()

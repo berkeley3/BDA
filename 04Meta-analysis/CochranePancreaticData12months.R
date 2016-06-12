@@ -51,16 +51,16 @@ inits = list(list(meanDiff=rnorm(1, -5, 5), tau=runif(1,0,5)),
              list(meanDiff=rnorm(1, -5, 5), tau=runif(1,0,5)),
              list(meanDiff=rnorm(1, -5, 5), tau=runif(1,0,5)))
 
-parameters =  c("meanDiff","tau","theta")     # The parameter(s) to be monitored.
-adaptSteps = 500              # Number of steps to "tune" the samplers.
-burnInSteps = 5000            # Number of steps to "burn-in" the samplers.
-nChains = 3                  # Number of chains to run.
-numSavedSteps=50000           # Total number of steps in chains to save.
-thinSteps=1                   # Number of steps to "thin" (1=keep every step).
-nIter = ceiling( ( numSavedSteps * thinSteps ) / nChains ) # Steps per chain.
+parameters <-  c("meanDiff","tau","theta")     # The parameter(s) to be monitored.
+adaptSteps <- 500              # Number of steps to "tune" the samplers.
+burnInSteps <- 5000            # Number of steps to "burn-in" the samplers.
+nChains <- 3                  # Number of chains to run.
+numSavedSteps <- 50000           # Total number of steps in chains to save.
+thinSteps <- 1                   # Number of steps to "thin" (1=keep every step).
+nIter <- ceiling( ( numSavedSteps * thinSteps ) / nChains ) # Steps per chain.
 
 
-jagsModel = jags.model( "pancreatic.txt" , data=bugsdata ,  inits=inits ,
+jagsModel <- jags.model( "pancreatic.txt" , data=bugsdata ,  inits=inits ,
                         n.chains=nChains , n.adapt=adaptSteps )
 
 cat( "Burning in the MCMC chain...\n" )

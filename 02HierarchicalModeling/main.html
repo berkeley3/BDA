@@ -544,14 +544,14 @@ samplesAutoC(&quot;*&quot;, 1)     # plot autocorrelation</pre>
 </article></slide><slide class=''><hgroup><h2>JAGS</h2></hgroup><article  id="jags">
 
 <pre class = 'prettyprint lang-r'>parameters &lt;- c(&#39;m&#39;, &#39;tau&#39;, &#39;tau.a&#39;, &#39;s2&#39;,&#39;s2.a&#39;,&#39;ts2&#39;,&#39;cor&#39;)
-adaptSteps = 500              # Number of steps to &quot;tune&quot; the samplers.
-burnInSteps = 5000            # Number of steps to &quot;burn-in&quot; the samplers.
-nChains = 1                  # Number of chains to run.
-numSavedSteps=50000           # Total number of steps in chains to save.
-thinSteps=1                   # Number of steps to &quot;thin&quot; (1=keep every step).
-nIter = ceiling( ( numSavedSteps * thinSteps ) / nChains ) # Steps per chain.
+adaptSteps &lt;- 500              # Number of steps to &quot;tune&quot; the samplers.
+burnInSteps &lt;- 5000            # Number of steps to &quot;burn-in&quot; the samplers.
+nChains &lt;- 1                  # Number of chains to run.
+numSavedSteps &lt;- 50000           # Total number of steps in chains to save.
+thinSteps &lt;- 1                   # Number of steps to &quot;thin&quot; (1=keep every step).
+nIter &lt;- ceiling( ( numSavedSteps * thinSteps ) / nChains ) # Steps per chain.
 
-jagsModel = jags.model( &quot;model1.txt&quot; , data=data,  inits=inits1 ,
+jagsModel &lt;- jags.model( &quot;model1.txt&quot; , data=data,  inits=inits1 ,
                         n.chains=nChains , n.adapt=adaptSteps )</pre>
 
 </article></slide><slide class=''><hgroup><h2>JAGS</h2></hgroup><article  id="jags-1">
