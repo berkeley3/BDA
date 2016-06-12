@@ -210,8 +210,12 @@
 <li>Find the population of the <strong>proposal island</strong></li>
 <li>Find the population of the <strong>current island</strong></li>
 <li>Move to <strong>proposal</strong> with probability \(p_8/p_9\)</li>
-<li>Repeat from 1 <img src="images/MetropolisArcipelago_5.png" width="450px" height="400px" /></li>
-</ol></div>
+<li>Repeat from 1</li>
+</ol>
+
+<p><br></br></p>
+
+<p><img src="images/MetropolisArcipelago_5.png" width="450px" height="400px" /></p></div>
 
 <p>This procedure ensures visiting each island in proportion to its population in the <em>long run</em></p>
 
@@ -267,6 +271,17 @@ for (i in 1:iterations){
 <li><strong>Metropolis-Hastings (MH)</strong> does not</li>
 </ul>
 
+</article></slide><slide class=''><hgroup><h2>Metropolis-Hastings Sampling (Metropolis et al. 1953; Hastings 1970)</h2></hgroup><article  id="metropolis-hastings-sampling-metropolis-et-al.-1953-hastings-1970">
+
+<ul>
+<li>Proposes new poin by changing all parameters randomly</li>
+<li>Computes accept probability of new point based on ratio of new to old log probability (and proposal density)</li>
+<li>Only requires evaluation of \(p(\theta\vert y)\)</li>
+<li>Requires good proposal mechanism to be effective</li>
+<li>Acceptance requires small changes in log probability</li>
+<li>But small step size lead to random walks and slow convergence and mixing</li>
+</ul>
+
 </article></slide><slide class=''><hgroup><h2>Metropolis and MCMC</h2></hgroup><article  id="metropolis-and-mcmc-1">
 
 <ul>
@@ -316,6 +331,8 @@ for (i in 1:iterations){
 <li>Monte Carlo: Random simulation</li>
 </ul>
 
+<p><br></br> <br></br></p>
+
 <p><img src="images/markov.png" width="300px" height="400px" /></p></div>
 
 </article></slide><slide class=''><hgroup><h2>Why MCMC</h2></hgroup><article  id="why-mcmc">
@@ -331,6 +348,68 @@ for (i in 1:iterations){
 </ul></li>
 </ul>
 
+</article></slide><slide class=''><hgroup><h2>Monte Carlo Methods (Metropolis and Ulam 1949)</h2></hgroup><article  id="monte-carlo-methods-metropolis-and-ulam-1949">
+
+<ul>
+<li>For integrals that are impossible to solve analytically
+
+<ul>
+<li>but for which sampling and evaluation is tractable</li>
+</ul></li>
+<li>Compute plu-in estimates of statistics based on randomly generated variates
+
+<ul>
+<li>e.g means, variances, quantiles/intervals, comparisons</li>
+</ul></li>
+<li>Accuracy with \(M\) independent samples proportional to \[
+\frac{1}{\sqrt M}
+\]
+
+<ul>
+<li>100 times more samples per decimal place</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Monte Carlo Example</h2></hgroup><article  id="monte-carlo-example">
+
+<ul>
+<li><p>Posterior expectation of \(\theta\) \[
+E[\theta\vert y] = \int \theta p(\theta\vert y)d\theta 
+\]</p></li>
+<li><p>Bayesian estimate minimizing expected square error \[
+\hat\theta = \text{arg min}_{\theta^{&#39;}} E[(\theta - \theta^{&#39;})^2\vert y] = E[\theta\vert y] 
+\]</p></li>
+<li><p>Generate samples \(\theta^{(1)}, \theta^{(2)},\ldots ,\theta^{(M)}\) drawn from \(p(\theta\vert y)\)</p></li>
+<li><p>Monte Carlo Estimator plugs in average for expectation: \[
+E[\theta\vert y] \approx \frac{1}{M}\sum_{m=1}^M \theta^{(m)}
+\]</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Monte Carlo Example II</h2></hgroup><article  id="monte-carlo-example-ii">
+
+<ul>
+<li>Bayesian alternative to frequentist hypothesis testing</li>
+<li>Use probability to summarize results</li>
+<li><p>Bayesian comparison: probability \(\theta_1 &gt; \theta_2\) given data \(y\): \[
+\begin{eqnarray}
+P(\theta_1 &gt; \theta_2\vert y) &amp;=&amp; \int \int I(\theta_1 &gt; \theta_2)p(\theta_1\vert y)p(\theta_2\vert y)d\theta_1 d\theta_2\\
+ &amp;\approx &amp; \frac{1}{M}\sum_{m=1}^M  I(\theta_1^{(m)} &gt; \theta_2^{(m)})
+ \end{eqnarray}
+\]</p></li>
+<li><p>Bayesian hierarchical model <strong>adjust</strong> for multiple comparisons</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Markov Chain Monte Carlo</h2></hgroup><article  id="markov-chain-monte-carlo">
+
+<ul>
+<li>When sampling independently fom \(p(\theta\vert y)\) impossible</li>
+<li>\(\theta^{(m)}\) drawn via a Markov chain \(p(\theta^{(m)} \vert y, \theta^{(m-1)})\)</li>
+<li>Require MCMC marginal \(p(\theta^{(m)}\vert y)\) equal to true posterior marginal</li>
+<li>Leads to auto-correlation in samples \(\theta^{(1)}, \theta^{(2)},\ldots ,\theta^{(M)}\)</li>
+<li>Effective sample size \(N_{eff}\) divides out autocorrelation (must be estimated)</li>
+<li>Estimation accuracy proportional to \(1/\sqrt{N_{eff}}\)</li>
+</ul>
+
 </article></slide><slide class=''><hgroup><h2>MCMC Strategies</h2></hgroup><article  id="mcmc-strategies">
 
 <div class="col2">
@@ -342,6 +421,8 @@ for (i in 1:iterations){
 <li>All remain useful</li>
 <li>New methods being developed</li>
 </ul>
+
+<p><br></br> <br></br> <br></br></p>
 
 <p><img src="images/mcmcHandbook.png" width="350px" height="500px" /></p></div>
 
@@ -361,6 +442,21 @@ for (i in 1:iterations){
 <img src="images/gibbs.png" width="750px" height="350px" />
 
 </center>
+
+</article></slide><slide class=''><hgroup><h2>Gibbs sampling</h2></hgroup><article  id="gibbs-sampling-1">
+
+<ul>
+<li>Samples a parameter given data and other parameters</li>
+<li>Require conditional posterior \(p(\theta_n\vert y\theta_{-n})\)</li>
+<li>Conditional posterior easy in directed graphical model</li>
+<li>Requires general unidimensional sampler for non-conjugacy
+
+<ul>
+<li>JAGS uses slice sampler</li>
+<li>BUGS uses adaptive rejection sampler</li>
+</ul></li>
+<li>Conditional sampling and general unidimensional sampler can both lead to slow convergence and mixing</li>
+</ul>
 
 </article></slide><slide class=''><hgroup><h2>Hamiltonian Monte Carlo</h2></hgroup><article  id="hamiltonian-monte-carlo">
 
@@ -493,6 +589,8 @@ for (i in 1:iterations){
 <div class="col2">
 <p><img src="images/stanUlam.png" width="200px" height="300px" /></p>
 
+<p><br></br> <br></br> <br></br> <br></br> <br></br></p>
+
 <p><img src="images/stan.png" width="400px" height="600px" /></p></div>
 
 </article></slide><slide class=''><hgroup><h2>Stan is NUTS</h2></hgroup><article  id="stan-is-nuts">
@@ -520,6 +618,8 @@ for (i in 1:iterations){
 
 post2 &lt;- stan_lmer(oed ~ period + treatment + oedbase+ (1|patient), data=data)
 posterior_interval(post2, prob=0.95)</pre>
+
+<center>
 
 <table border="0">
 
@@ -655,6 +755,8 @@ sigma
 
 </table>
 
+</center>
+
 <ul>
 <li>\(\sigma \sim \text{dcauchy}\)</li>
 </ul>
@@ -671,6 +773,8 @@ sigma
 <li>Mean and variance undefined</li>
 <li>Related to Lévy flights</li>
 </ul>
+
+<p><br></br> <br></br> <br></br></p>
 
 <p><img src="images/cauchy.png" width="300px" height="500px" /></p></div>
 

@@ -75,6 +75,9 @@ output:
 3. Find the population of the __current island__
 4. Move to __proposal__ with probability $p_8/p_9$
 5. Repeat from 1
+
+<br></br>
+
  <img src="images/MetropolisArcipelago_5.png" width="450px" height="400px" />
 </div>
 
@@ -288,10 +291,20 @@ saveGIF({
 - Metropolis algorithm requires symmetrical proposals
 - __Metropolis-Hastings (MH)__ does not
 
+## Metropolis-Hastings Sampling (Metropolis et al. 1953; Hastings 1970)
+
+- Proposes new poin by changing all parameters randomly
+- Computes accept probability of new point based on ratio of new to old log probability (and proposal density)
+- Only requires evaluation of $p(\theta\vert y)$
+- Requires good proposal mechanism to be effective
+- Acceptance requires small changes in log probability
+- But small step size lead to random walks and slow convergence and mixing
+
 ## Metropolis and MCMC
 
 - Metropolis: Simple version of Markov chain Monte Carlo (MCMC)
 - Metropolis, Rosenbluth, Rosenbluth, Teller, and Teller (1953)
+
 
  <center><img src="images/Teller.png" width="800px" height="350px" /></center>
 
@@ -324,6 +337,9 @@ saveGIF({
 - Markov chain: History doesn't matter, just where you are now
 - Monte Carlo: Random simulation
 
+<br></br>
+<br></br>
+
 <img src="images/markov.png" width="300px" height="400px" />
 
 </div>
@@ -336,6 +352,60 @@ saveGIF({
     - Networks/phylogenies
     - Some spatial models
     
+## Monte Carlo Methods (Metropolis and Ulam 1949)
+
+- For integrals that are impossible to solve analytically
+    - but for which sampling and evaluation is tractable
+- Compute plu-in estimates of statistics based on randomly generated variates
+    - e.g means, variances, quantiles/intervals, comparisons
+- Accuracy with $M$ independent samples proportional to
+$$
+\frac{1}{\sqrt M}
+$$
+    - 100 times more samples per decimal place
+
+## Monte Carlo Example
+
+- Posterior expectation of $\theta$
+$$
+E[\theta\vert y] = \int \theta p(\theta\vert y)d\theta 
+$$
+
+- Bayesian estimate minimizing expected square error
+$$
+\hat\theta = \text{arg min}_{\theta^{'}} E[(\theta - \theta^{'})^2\vert y] = E[\theta\vert y] 
+$$
+
+- Generate samples $\theta^{(1)}, \theta^{(2)},\ldots ,\theta^{(M)}$ drawn from $p(\theta\vert y)$
+
+- Monte Carlo Estimator plugs in average for expectation:
+$$
+E[\theta\vert y] \approx \frac{1}{M}\sum_{m=1}^M \theta^{(m)}
+$$
+
+## Monte Carlo Example II
+
+- Bayesian alternative to frequentist hypothesis testing
+- Use probability to summarize results
+- Bayesian comparison: probability $\theta_1 > \theta_2$ given data $y$:
+$$
+\begin{eqnarray}
+P(\theta_1 > \theta_2\vert y) &=& \int \int I(\theta_1 > \theta_2)p(\theta_1\vert y)p(\theta_2\vert y)d\theta_1 d\theta_2\\
+ &\approx & \frac{1}{M}\sum_{m=1}^M  I(\theta_1^{(m)} > \theta_2^{(m)})
+ \end{eqnarray}
+$$
+
+- Bayesian hierarchical model __adjust__ for multiple comparisons
+
+## Markov Chain Monte Carlo
+
+- When sampling independently fom $p(\theta\vert y)$ impossible
+- $\theta^{(m)}$ drawn via a Markov chain $p(\theta^{(m)} \vert y, \theta^{(m-1)})$
+- Require MCMC marginal $p(\theta^{(m)}\vert y)$ equal to true posterior marginal
+- Leads to auto-correlation in samples $\theta^{(1)}, \theta^{(2)},\ldots ,\theta^{(M)}$
+- Effective sample size $N_{eff}$ divides out autocorrelation (must be estimated)
+- Estimation accuracy proportional to $1/\sqrt{N_{eff}}$
+
 ## MCMC Strategies
 
 <div class="col2">
@@ -346,6 +416,10 @@ saveGIF({
 - __Hamiltonian Monte Carlo (HMC)__
 - All remain useful
 - New methods being developed
+
+<br></br>
+<br></br>
+<br></br>
 
 <img src="images/mcmcHandbook.png" width="350px" height="500px" />
 
@@ -358,6 +432,16 @@ saveGIF({
     - Basis of BUGS, JAGS
 
 <center><img src="images/gibbs.png" width="750px" height="350px" /></center>
+
+## Gibbs sampling
+
+- Samples a parameter given data and other parameters
+- Require conditional posterior $p(\theta_n\vert y\theta_{-n})$
+- Conditional posterior easy in directed graphical model
+- Requires general unidimensional sampler for non-conjugacy
+    - JAGS uses slice sampler
+    - BUGS uses adaptive rejection sampler
+- Conditional sampling and general unidimensional sampler can both lead to slow convergence and mixing
 
 
 ## Hamiltonian Monte Carlo
@@ -440,6 +524,13 @@ posterior distribution
 
 <img src="images/stanUlam.png" width="200px" height="300px" />
 
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+
+
 <img src="images/stan.png" width="400px" height="600px" />
 
 </div>
@@ -465,14 +556,14 @@ posterior_interval(post2, prob=0.95)
 
 ```
 
-<table border=0>
+<center><table border=0>
 <tr> <th>  </th> <th> 2.5% </th> <th> 97.5% </th>  </tr>
   <tr> <td align="right"> (Intercept) </td> <td align="right"> -3.03 </td> <td align="right"> 2.77 </td> </tr>
   <tr> <td align="right"> period </td> <td align="right"> -0.48 </td> <td align="right"> 0.00 </td> </tr>
   <tr> <td align="right"> treatment </td> <td align="right"> -0.55 </td> <td align="right"> -0.06 </td> </tr>
   <tr> <td align="right"> oedbase </td> <td align="right"> 0.93 </td> <td align="right"> 1.04 </td> </tr>
   <tr> <td align="right"> sigma </td> <td align="right"> 0.63 </td> <td align="right"> 0.89 </td> </tr>
-   </table>
+   </table></center>
 
 - $\sigma \sim \text{dcauchy}$
 
@@ -487,6 +578,11 @@ One of many things named after Augustin-Louis Cauchy (KO-shee)
 - Parameters: location of mode, scale
 - Mean and variance undefined
 - Related to Lévy flights
+
+<br></br>
+<br></br>
+<br></br>
+
 
  <img src="images/cauchy.png" width="300px" height="500px" />
 </div>
