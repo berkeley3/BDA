@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bayesian Data Analysis for Medical Data</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="main_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Bayesian Data Analysis for Medical Data',
+                        subtitle: 'Bayesian Disease Mapping',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: 'main_files/logo.jpg',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Paola Berchialla' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(main_files/logo.jpg) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets\css\ioslides.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="main_files/logo.jpg"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<h4>Put in your css file or directly in rmarkdown</h4>
+
+<style>
+  .col2 {
+    columns: 2 300px;         /* number of columns and width in pixels*/
+    -webkit-columns: 2 200px; /* chrome, safari */
+    -moz-columns: 2 200px;    /* firefox */
+  }
+  .col3 {
+    columns: 3 100px;
+    -webkit-columns: 3 100px;
+    -moz-columns: 3 100px;
+  }
+</style>
+
+<slide class=''><hgroup><h2>Disease Mapping</h2></hgroup><article  id="disease-mapping">
+
+<ul>
+<li><p>Disease mapping is one of the areas of applied statistics that is developing most rapidly and is in most demand</p></li>
+<li><p>I It involved both spatial data and methods ranging from visualisation to advanced statistics</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Spatial data</h2></hgroup><article  id="spatial-data">
+
+<ul>
+<li>Spatial data include the location and/or relative positions of the data values</li>
+<li>Locations may be:
+
+<ul>
+<li>point or areal referenced</li>
+<li>regularly or irregularly spaced</li>
+<li>continuous or discrete</li>
+</ul></li>
+<li>Attributes measured at each location may be:
+
+<ul>
+<li>continuous (pollution concentration)</li>
+<li>discrete (counts of events)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Classes of spatial data</h2></hgroup><article  id="classes-of-spatial-data" class="smaller">
+
+<ol>
+<li>Geostatistical data
+
+<ul>
+<li>locations are fixed points</li>
+<li>attributes are usually continuous
+
+<ul>
+<li>rainfall at monitoring stations; pollution measured at fixed sampling sites</li>
+</ul></li>
+</ul></li>
+<li>Point patterns
+
+<ul>
+<li>point locations of <strong>events</strong> are themselves the variable of interest</li>
+<li>data are a finit number of locations observed in a study region</li>
+<li>attributes (additional variables associated with each event) may be measured at each location: <strong>marked point process</strong>
+
+<ul>
+<li>locations of cases of disease (mark: age, sex), e.g. centroid of home postcode of cancer patients</li>
+</ul></li>
+</ul></li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Classes of spatial data</h2></hgroup><article  id="classes-of-spatial-data-1">
+
+<ol>
+<li>Lattice data
+
+<ul>
+<li>locations are spatial regions</li>
+<li>regions may be references by their centroids and/or by an adjacency matrix defining the set of neighbouring regions associated with each region</li>
+<li>attributes may be counts of events within each region
+
+<ul>
+<li>counts cases of disease in administrative areas</li>
+</ul></li>
+</ul></li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Why spatial data are special</h2></hgroup><article  id="why-spatial-data-are-special">
+
+<ul>
+<li>Many statistical methods are based on the assumption that the observations are identically distribuited and <strong>independent</strong></li>
+<li>Data that occur close together in space (or time) are likely to be <strong>correlated</strong>
+
+<ul>
+<li><strong>dependence</strong> between observation is a more realistic asumption</li>
+</ul></li>
+<li>Small area epidemiological data falls into the category of <strong>lattice</strong> data</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Spatiallly structured priors</h2></hgroup><article  id="spatiallly-structured-priors">
+
+<ul>
+<li>Random effects can be though of as <strong>latent variables</strong> which capture the effects of unknown or unmeasured area level risk factors</li>
+<li>Area level covariates are spatially structured (environmental effects)
+
+<ul>
+<li>prior distribution for the random effects should allow for spatial correlation</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Convolution prior for relative risk</h2></hgroup><article  id="convolution-prior-for-relative-risk">
+
+<ul>
+<li>Besag et al. recommend combining <strong>Conditional autoregressive</strong> prior for random effects and the standard normal prior to allow for both
+
+<ul>
+<li>spatially unstructured latent covariates</li>
+<li>spatially correlated latent covariates</li>
+</ul></li>
+</ul>
+
+<p>\[
+\begin{eqnarray}
+\theta_i &amp; = &amp; u_i + v_i\\
+u_i &amp; \sim &amp; Normal(0, \sigma_u^2)\\
+v_i\vert v_{j, j\neq i} &amp;\sim &amp; Normal (m_i, \sigma_v^2/n_i)
+\end{eqnarray}
+\] where \(m_i = \frac{\sum_{j\neq i}s_j}{n_i}\) and \(n_i\) is the number of neighbours</p>
+
+<ul>
+<li>\(v_i\) is smoother towards mean risk in set of neighbouring areas, with variance inversely proportional to the number of neighbours</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Bayesian Disease Mapping</h2></hgroup><article  id="bayesian-disease-mapping">
+
+<ul>
+<li><p>Bayesian Estimation in Disease Mapping has been one of the leading topics in spatial statistics in the last 20 years</p></li>
+<li>Bayesian Hierarchical Models can be used to model complex data structures</li>
+<li><p>The Bayesian approach offers an easy approach to the estimation of complex models via Markov Chain Monte Carlo</p></li>
+<li><p>Spatial analysis of routinoulsy collected health data is standard practise nowadays</p></li>
+<li><p>Spatio-temporal models can be used</p></li>
+<li><p>Waller &amp; Gotway (2004) and Banerjee et al. (2003) account for a comprehensive summary on spatial models</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Bayesian Spatial Modeling</h2></hgroup><article  id="bayesian-spatial-modeling" class="smaller">
+
+<div class="col2">
+<p>\[
+\begin{eqnarray}
+O_i &amp;\sim &amp; \text{Poisson}(\mu_i) \\
+\mu_i &amp; = &amp; \theta_i E_i\\
+\\
+\log(\theta_i) &amp; = &amp; \alpha +\beta X_i + u_i+v_i\\
+u_i &amp; \sim &amp; \text{Normal}(0, \sigma_u^2)\\
+v_i\vert v_{-i} &amp;\sim&amp;  \text{Normal}(\sum_{j\sim i}v_j/n_j, \sigma_v^2/n_i)\\
+\\
+f(\alpha) &amp;\propto &amp; 1\\
+f(\beta) &amp;\propto &amp; 1\\
+\sigma_u^2 &amp;\sim&amp; \text{InvGamma}(0.001,0.001)\\
+\sigma_v^2 &amp;\sim&amp; \text{InvGamma}(0.001,0.001)\\
+\end{eqnarray}
+\]</p>
+
+<p><img src="images/BYM.gif" width="450px" height="400px" /></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Model specification in BUGS</h2></hgroup><article  id="model-specification-in-bugs" class="smaller">
+
+<pre class = 'prettyprint lang-r'>model{
+  for (i in 1:N){
+    O[i] ~ dpois(mu[i])
+    mu[i] ~ theta[i] + E[i]
+  
+    log( theta[i]) &lt;- alpha + beta[1]*X[i] + beta[2]*X[2] + beta[3]*X[3] + u[i] + v[i]
+    
+     u[i] ~ dnorm(0, precu)
+     
+     SMR[i] &lt;- O[i]/E[i]
+     prob[i] &lt;- step(theta[i]-1)
+  }
+  v[1:N] ~ car.normal(adj[], weights[], num[], precv)
+  
+  alpha ~ dflat()
+  for(i in 1:3) {beta[i]~ dflat()}
+  
+  precu  ~ dgamma(0.001, 0.001)
+  precv  ~ dgamma(0.001, 0.001)
+  
+  sigmau &lt;- 1/precu
+  sigmav &lt;- 1/precv
+  
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Convolution prior in BUGS</h2></hgroup><article  id="convolution-prior-in-bugs">
+
+<ul>
+<li><strong>adj[]</strong>: sparse (vector) representation of adjacency matrix
+
+<ul>
+<li>1,4,6,9,</li>
+<li>2,3,5</li>
+<li>4,8,11,18,23</li>
+</ul></li>
+<li><strong>num[]</strong>: vector of lenght = number of areas giving number of neighbours for each area
+
+<ul>
+<li>num = c(4,3,5,&#8230;)</li>
+</ul></li>
+<li><strong>weights[]</strong>: vector givint weights for each pair of neighbours
+
+<ul>
+<li>weights = 1 gives the commonly used adjacency weights</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Comments on the intrisic CAR prior</h2></hgroup><article  id="comments-on-the-intrisic-car-prior">
+
+<ul>
+<li>CAR prior \(v_i\vert v_j\) is expressed as a multivariate distribution for the vactor of spatial random effects \(V = \{v_i}_{i=1,\ldots N}\)</li>
+<li>Intrisic CAR prior is improper (overall mean is undefined)
+
+<ul>
+<li>Besat and Koopersberg, Biometrika 1995</li>
+</ul></li>
+<li><strong>car.normal</strong> prior imposes <em>sum-to-zero</em> constraint \((\sum_ v_i = 0)\)
+
+<ul>
+<li>can include separate intercept term \(\alpha\)</li>
+<li>hyperprior on \(\alpha\) should be improper</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Interpretation of the spatial variance parameter</h2></hgroup><article  id="interpretation-of-the-spatial-variance-parameter">
+
+<ul>
+<li>The variance parameter \(v\) of the intrisic CAR random effects is a <em>conditional</em> (spatial) variance and is difficult to interpret
+
+<ul>
+<li>it approximates posterior distribution of marginal spatial variance by distribution of empirical variance of the spatial random effects</li>
+</ul></li>
+<li>Advice: monitor posterior samples
+
+<ul>
+<li>sd.emp &lt;- sd(v[])</li>
+<li>v.emp &lt;- pow(sd.emp, 2)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Statistical significance</h2></hgroup><article  id="statistical-significance">
+
+<ul>
+<li>It is straghforward to decide if there is <em>statistically significant</em> eccess of risk in area \(i\)</li>
+</ul>
+
+<center>
+
+<img src="images/figure1.png" width=500 height=300>
+
+</center>
+
+<ul>
+<li>compute posterior probability of \(\theta_i&gt;1\)
+
+<ul>
+<li>area under posterior distribution curve to the right of 1</li>
+<li>proportion of values in the posterior sample of prob[i] &gt;1</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Statistical significance</h2></hgroup><article  id="statistical-significance-1">
+
+<center>
+
+<img src="images/figure1.png" width=500 height=300>
+
+</center>
+
+<ul>
+<li>it can be interpreted directly as a marginal probability</li>
+<li>Based on hierarchical model no need to worry about problems of multiple testing
+
+<ul>
+<li>probabilities are base on shrunk estimates</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>References</h2></hgroup><article  id="references">
+
+<ul>
+<li><p>S. Banerjee, B.P. Carlin and A.E. Gelfand (2003). Hierarchical Modeling and Analysis for Spatial Data. Chapman &amp; Hall.</p></li>
+<li><p>J. Besag, J. York, A. Mollie (1991). Bayesian image restoration, with two applications in spatial statistics (with discussion). Annals of the Institute of Statistical Mathematics 43(1), 1-59</p></li>
+<li><p>A.B. Lawson, W.J. Browne and C.L. Vidal Rodeiro (2003). Disease Mapping with WinBUGS and MLwiN. Wiley &amp; Sons.</p></li>
+<li><p>D.J. Spiegelhalter, N.G. Best, B.P. Carlin and A. Van der Linde (2002). Bayesian Measures of Model Complexity and Fit (with Discussion), Journal of the Royal Statistical Society, Series B 64(4), 583-616.</p></li>
+<li><p>L.A. Waller and C.A. Gotway (2004). Applied Spatial Statistics for Public Health Data. Wiley &amp; Sons.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Getting the slides</h2></hgroup><article  id="getting-the-slides">
+
+<ul>
+<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a>.</li>
+<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a>.</li>
+<li><p>To re-compile the slides:</p>
+
+<ul>
+<li>Download the directory containing the lectures from Github</li>
+<li>In R open the .Rmd file and set the working directory to the lecture directory</li>
+<li>Click the <em>KnitHTML</em> button on Rstudio or run the following commands:</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(rmarkdown) 
+render(&quot;main.Rmd&quot;)</pre></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="main_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="main_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "main_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
