@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bayesian Data Analysis for Medical Data</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="main_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="main_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Bayesian Data Analysis for Medical Data',
+                        subtitle: 'Example of Bayesian Disease Mapping',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: 'main_files/logo.jpg',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Paola Berchialla' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(main_files/logo.jpg) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets\css\ioslides.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="main_files/logo.jpg"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Assessment of the impact of cancer in the province of Vercelli from 2002 to 2009</h2></hgroup><article  id="assessment-of-the-impact-of-cancer-in-the-province-of-vercelli-from-2002-to-2009">
+
+<ul>
+<li><p>Provide an epidemiological overview of the impact of neoplasms in an area that has no cancer registry</p></li>
+<li><p>Hospital discharge documents were used to estimate the number of cases</p></li>
+<li>The expected number of cases was calculated on the basis of</li>
+<li>specific rates divided by age in the years 2002 - 2009<br/></li>
+<li><p>comparison with new cases of cancer in the city of Turin from 2005 to 2007, used as standard population.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Example of spatial analysis: import the map</h2></hgroup><article  id="example-of-spatial-analysis-import-the-map">
+
+<pre class = 'prettyprint lang-r'># imort the map------------
+load(&#39;data/ITA_adm3.RData&#39;) #url: http://gadm.org/country
+
+vcmap=gadm[gadm$NAME_2==&#39;Vercelli&#39;,]
+plot(vcmap)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Import data</h2></hgroup><article  id="import-data">
+
+<pre class = 'prettyprint lang-r'>#import db with observed and expected cases----
+db=read.csv(&#39;data\\db.csv&#39;,sep=&#39;;&#39;)
+
+## workout to merge municipalities  on your db with municipalities on the map object---
+db$comune=tolower(db$COMUNE)
+
+comuni=vcmap[,&#39;NAME_3&#39;]@data
+comuni[,1]=tolower(as.character(comuni[,1]))
+a=setdiff(sort(tolower(as.character(comuni[,1]))),db$comune)
+comuni[match(a,comuni[,1]),1]=&quot;borgo d&#39;ale&quot;
+db.comuni=merge(comuni, db, by.y=&#39;comune&#39;, by.x=&#39;NAME_3&#39;, sort=F)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Create spatial objects</h2></hgroup><article  id="create-spatial-objects">
+
+<pre class = 'prettyprint lang-r'>### create spatial dataframe of observed and expected----
+vcmap=SpatialPolygonsDataFrame(vcmap,db.comuni,match.ID=F)
+
+### - Create adjacency matrix-----
+vcnb=poly2nb(vcmap)
+
+### Create weights------
+vcWBweights=nb2WB(vcnb)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Model definition</h2></hgroup><article  id="model-definition">
+
+<ul>
+<li>Write down the model</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Model definition</h2></hgroup><article  id="model-definition-1">
+
+<pre class = 'prettyprint lang-r'>model=function() {
+  for(i in 1:N){
+    O[i]~dpois(mu[i])
+    mu[i]&lt;-theta[i]*E[i]
+    log(theta[i])&lt;- u[i]+v[i]
+    u[i]~dnorm(0,precu)
+    SMR[i]&lt;-O[i]/E[i]
+    prob[i]&lt;-step(theta[i]-1)
+  }
+  v[1:N]~car.normal(adj[],weights[],num[],precv)
+  precu~dgamma(0.001,0.001)
+  precv~dgamma(0.001,0.001)
+  sigmau&lt;-1/precu
+  sigmav&lt;-1/precv
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Make the model operative</h2></hgroup><article  id="make-the-model-operative">
+
+<pre class = 'prettyprint lang-r'>## define and run model------
+mfile=paste(getwd(), &quot;/model.txt&quot;, sep = &quot;&quot;, collapse = &quot;&quot;)
+tdir=paste(getwd(), &quot;/Endoutput&quot;, sep = &quot;&quot;, collapse = &quot;&quot;)
+dir.create(tdir)
+write.model(model,mfile)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Initialize and run the model</h2></hgroup><article  id="initialize-and-run-the-model">
+
+<pre class = 'prettyprint lang-r'>d=list(O=vcmap$OSS,E=vcmap$ATT, N=86)
+inits1=list(u=rep(0,86),v=rep(0,86),precu=1,precv=1)
+#inits2=list(u=rep(1,86),v=rep(1,86),precu=0.1,precv=0.1)
+
+res= bugs(data = c(d, vcWBweights),
+          inits = list(inits1),
+          parameters.to.save = c(&quot;u&quot;, &quot;v&quot;, &quot;theta&quot;,&quot;prob&quot;, &quot;sigmau&quot;, &quot;sigmav&quot;),
+          model.file = mfile, debug=T,
+          n.thin = 3,
+          n.chains = 1,
+          n.iter = 60000, 
+          n.burnin = 20000) </pre>
+
+</article></slide><slide class=''><hgroup><h2>Add the result to the map</h2></hgroup><article  id="add-the-result-to-the-map">
+
+<pre class = 'prettyprint lang-r'>### add results to map object------
+vcmap$prob=res$mean$prob
+vcmap$theta=res$mean$theta
+vcmap$u=res$mean$u
+vcmap$v=res$mean$v
+logfile=paste(getwd(), &quot;/Endoutput/log.txt&quot;, sep = &quot;&quot;, collapse = &quot;&quot;)
+reslog= bugs.log(file = logfile)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Set colors and legend</h2></hgroup><article  id="set-colors-and-legend">
+
+<pre class = 'prettyprint lang-r'>### plot the map-----
+fbreaks=c(min(vcmap$theta)-0.1, quantile(vcmap$theta, probs=c(0.2,0.4,0.6,0.8)),
+          max(vcmap$theta)+0.1)
+thetaint=classIntervals(vcmap$theta, n=5, style=&quot;fixed&quot;,
+                        fixedBreaks=fbreaks) 
+cols=brewer.pal(5, &#39;Blues&#39;) 
+cktheta=list(labels=as.character(formatC(thetaint$brks, digits=3)),
+             at=(0:5)/5, height=.5)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Plot the map</h2></hgroup><article  id="plot-the-map">
+
+<center>
+
+<img src="images/vercelli.png" width=600 height=500>
+
+</center>
+
+</article></slide><slide class=''><hgroup><h2>Plot the map</h2></hgroup><article  id="plot-the-map-1">
+
+<pre class = 'prettyprint lang-r'>print(spplot(vcmap, &quot;theta&quot;, col.regions= cols,
+             at=thetaint$brks, axes=TRUE, colorkey=cktheta,
+             main=&#39;Vercelli&#39;)) </pre>
+
+</article></slide><slide class=''><hgroup><h2>Getting the slides</h2></hgroup><article  id="getting-the-slides">
+
+<ul>
+<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a>.</li>
+<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a>.</li>
+<li><p>To re-compile the slides:</p>
+
+<ul>
+<li>Download the directory containing the lectures from Github</li>
+<li>In R open the .Rmd file and set the working directory to the lecture directory</li>
+<li>Click the <em>KnitHTML</em> button on Rstudio or run the following commands:</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(rmarkdown) 
+render(&quot;main.Rmd&quot;)</pre></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="main_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="main_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="main_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="main_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "main_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

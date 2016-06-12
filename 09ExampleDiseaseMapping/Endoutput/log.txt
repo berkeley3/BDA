@@ -1,0 +1,18 @@
+model is syntactically correct
+data loaded
+model compiled
+initial values loaded and chain initialized but another chain contains uninitialized variables
+error for node v[1] of type SpatialCARNormal.Node node has invalid value error pos 2287
+error for node v[1] of type SpatialCARNormal.Node node has invalid value
+model must be initialized before updating
+model must be initialized before monitors used
+model must be initialized before monitors used
+model must be initialized before monitors used
+model must be initialized before monitors used
+model must be initialized before monitors used
+model must be initialized before monitors used
+model must be initialized before monitors used
+model must be initialized before DIC can be monitored
+model must be initialized before updating
+model must be initialized before monitors used
+DIC monitor not set

@@ -1,0 +1,181 @@
+---
+title: "Bayesian Data Analysis for Medical Data"
+subtitle: Example of Bayesian Disease Mapping
+author      : Paola Berchialla
+job         : Department of Clinical and Biological Sciences, University of Torino
+output:
+  ioslides_presentation:
+    css: assets/css/ioslides.css
+    logo: assets/img/dscb.jpg
+    mathjax: local
+    self_contained: no
+    widescreen: yes
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+## Assessment of the impact of cancer in the province of Vercelli from 2002 to 2009
+
+
+- Provide an epidemiological overview of the impact of neoplasms in an area that has no cancer registry
+
+- Hospital discharge documents were used to estimate the number of cases 
+
+- The expected number of cases was calculated on the basis of 
+  - specific rates divided by age in the years 2002 - 2009  
+  - comparison with new cases of cancer in the city of Turin from 2005 to 2007, used as standard population. 
+
+## Example of spatial analysis: import the map
+
+```{r, eval=FALSE}
+
+# imort the map------------
+load('data/ITA_adm3.RData') #url: http://gadm.org/country
+
+vcmap=gadm[gadm$NAME_2=='Vercelli',]
+plot(vcmap)
+
+```
+
+## Import data
+```{r, eval=FALSE}
+
+#import db with observed and expected cases----
+db=read.csv('data\\db.csv',sep=';')
+
+## workout to merge municipalities  on your db with municipalities on the map object---
+db$comune=tolower(db$COMUNE)
+
+comuni=vcmap[,'NAME_3']@data
+comuni[,1]=tolower(as.character(comuni[,1]))
+a=setdiff(sort(tolower(as.character(comuni[,1]))),db$comune)
+comuni[match(a,comuni[,1]),1]="borgo d'ale"
+db.comuni=merge(comuni, db, by.y='comune', by.x='NAME_3', sort=F)
+
+```
+
+## Create spatial objects
+
+```{r, eval=FALSE}
+### create spatial dataframe of observed and expected----
+vcmap=SpatialPolygonsDataFrame(vcmap,db.comuni,match.ID=F)
+
+### - Create adjacency matrix-----
+vcnb=poly2nb(vcmap)
+
+### Create weights------
+vcWBweights=nb2WB(vcnb)
+
+```
+
+## Model definition
+
+- Write down the model
+
+## Model definition
+
+
+```{r, eval=FALSE}
+
+model=function() {
+  for(i in 1:N){
+    O[i]~dpois(mu[i])
+    mu[i]<-theta[i]*E[i]
+    log(theta[i])<- u[i]+v[i]
+    u[i]~dnorm(0,precu)
+    SMR[i]<-O[i]/E[i]
+    prob[i]<-step(theta[i]-1)
+  }
+  v[1:N]~car.normal(adj[],weights[],num[],precv)
+  precu~dgamma(0.001,0.001)
+  precv~dgamma(0.001,0.001)
+  sigmau<-1/precu
+  sigmav<-1/precv
+}
+
+```
+
+## Make the model operative
+
+```{r, eval=FALSE}
+
+## define and run model------
+mfile=paste(getwd(), "/model.txt", sep = "", collapse = "")
+tdir=paste(getwd(), "/Endoutput", sep = "", collapse = "")
+dir.create(tdir)
+write.model(model,mfile)
+
+```
+
+## Initialize and run the model
+
+```{r, eval=FALSE}
+d=list(O=vcmap$OSS,E=vcmap$ATT, N=86)
+inits1=list(u=rep(0,86),v=rep(0,86),precu=1,precv=1)
+#inits2=list(u=rep(1,86),v=rep(1,86),precu=0.1,precv=0.1)
+
+res= bugs(data = c(d, vcWBweights),
+          inits = list(inits1),
+          parameters.to.save = c("u", "v", "theta","prob", "sigmau", "sigmav"),
+          model.file = mfile, debug=T,
+          n.thin = 3,
+          n.chains = 1,
+          n.iter = 60000, 
+          n.burnin = 20000) 
+
+```
+
+
+## Add the result to the map
+
+```{r, eval=FALSE}
+
+### add results to map object------
+vcmap$prob=res$mean$prob
+vcmap$theta=res$mean$theta
+vcmap$u=res$mean$u
+vcmap$v=res$mean$v
+logfile=paste(getwd(), "/Endoutput/log.txt", sep = "", collapse = "")
+reslog= bugs.log(file = logfile)
+```
+
+## Set colors and legend
+```{r, eval=FALSE}
+
+### plot the map-----
+fbreaks=c(min(vcmap$theta)-0.1, quantile(vcmap$theta, probs=c(0.2,0.4,0.6,0.8)),
+          max(vcmap$theta)+0.1)
+thetaint=classIntervals(vcmap$theta, n=5, style="fixed",
+                        fixedBreaks=fbreaks) 
+cols=brewer.pal(5, 'Blues') 
+cktheta=list(labels=as.character(formatC(thetaint$brks, digits=3)),
+             at=(0:5)/5, height=.5)
+
+
+```
+
+## Plot the map
+
+<center><img src="images/vercelli.png" width=600 height=500></center>
+
+## Plot the map
+```{r, eval=FALSE}
+print(spplot(vcmap, "theta", col.regions= cols,
+             at=thetaint$brks, axes=TRUE, colorkey=cktheta,
+             main='Vercelli')) 
+```
+
+## Getting the slides
+
+* The slides for this course were created with Rmarkdown: [http://rmarkdown.rstudio.com/](http://rmarkdown.rstudio.com/). 
+* They are available from [https://github.com/berkeley3/BDA](https://github.com/berkeley3/BDA).
+* To re-compile the slides:
+
+    + Download the directory containing the lectures from Github
+    + In R open the .Rmd file and set the working directory to the lecture directory
+    + Click the *KnitHTML* button on Rstudio or run the following commands: 
+  
+```{r RmarkdownChunk, eval=FALSE}
+library(rmarkdown) 
+render("main.Rmd")
+```
