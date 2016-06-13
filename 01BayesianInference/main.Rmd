@@ -819,6 +819,35 @@ $$
 - All share property of involving full Bayesian inference.
 
 
+## Homework: OPTIMISE Trial
+
+- OPTIMSE (Optimisation of Cardiovascular Management to Improve Surgical Outcome) is a multi-centre randomised controlled trial which was carried out to try and determine if the optimisation of Cardiovascular Management intervention was of benefit.
+JAMA. 2014;311(21):2181-2190. doi:10.1001/jama.2014.5305
+
+- Patients were randomised to a cardiac output-guided hemodynamic therapy for intravenous fluid and a drug to increase heart muscle contraction (the inotrope, dopexamine) during and 6 hours following surgery (intervention group) or to usual care (control group).
+
+- The primary outcome measure was the relative risk (RR) of a composite of 30-day moderate or major complications and mortality.
+
+
+## Homework: OPTIMISE Trial
+
+- __Results__
+
+- Focusing on the primary outcome measure, there were 158/364 (43.3%) and 134/366 (36.6%) patients with complication/mortality in the control and intervention group respectively. 
+Using the standard statistical approach, the relative risk (95% confidence interval) = 0.84 (0.70-1.01), p=0.07 and absolute risk difference = 6.8% (-0.3% to 13.9%), p=0.07. The authors reasonably concluded that:
+
+- In a randomized trial of high-risk patients undergoing major gastrointestinal surgery, use of a cardiac output-guided hemodynamic therapy algorithm compared with usual care did not reduce a composite outcome of complications and 30-day mortality.
+
+## Homework: OPTIMISE Trial
+
+- Focus on the absolute difference risk groups and repeat the analysis in a Bayesian framework. 
+
+- Assuming a non-informative prior, for example Beta(1,1), for complication/mortality rate in both groups, derive the posterior distribution for the absolute difference risk.
+
+- Using the posterior distribution of the intervention group complication/mortality rate and the posterior distribution of the usual care group, simulate patients' outcome to  determine the proportion of cases in which the intervention would result in no complication/death  while the usual care would result in complication/death: 
+    - what is the probability of patients to get benefit from the intervention compared with usual care?
+
+
 ## Getting the slides
 
 * The slides for this course were created with Rmarkdown: [http://rmarkdown.rstudio.com/](http://rmarkdown.rstudio.com/). 
