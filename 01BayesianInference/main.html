@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                favIcon: 'main_files/logo.jpg',
+                        favIcon: 'main_files/logo.jpg',
               },
 
       // Author information
@@ -110,13 +110,114 @@
           </hgroup>
   </slide>
 
-<slide class=''><hgroup><h2>Quiz!</h2></hgroup><article  id="quiz">
+<slide class=''><hgroup><h2>Repeated i.i.d. trials</h2></hgroup><article  id="repeated-i.i.d.-trials">
 
-<p><img src="main_files/figure-html/quiz-1.png" title="" alt="" width="720" style="display: block; margin: auto;" /></p>
+<ul>
+<li>Suppose to generate a outcome from among several potential outcomes</li>
+<li>Suppose outcome chances are the same each time
+
+<ul>
+<li>outcomes are independent and identically distributed (i.i.d)</li>
+</ul></li>
+<li>Suppose the outcome is binary (e.g. 0,1; dead/alive,&#8230;)
+
+<ul>
+<li>20% chance of outcome 1</li>
+<li>80% chance of outcome 0</li>
+</ul></li>
+<li>Consider different numbers of trials
+
+<ul>
+<li>how will proportion of successes in sample differ?</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Simulating i.i.d. Binary Trials</h2></hgroup><article  id="simulating-i.i.d.-binary-trials">
+
+<pre class = 'prettyprint lang-r'>rbinom(10, N, 0.2)/N</pre>
+
+<p>10 trials: (0% to 60% success rate)</p>
+
+<p>0 1 4 1 0 6 2 1 1 2</p>
+
+<p>100 trials: (18% to 22% success rate)</p>
+
+<p>18 21 22 22 19 21 19 21 20 21</p>
+
+<p>100 trials: (19.6% to 22.3% success rate)</p>
+
+<p>215 210 223 213 212 214 200 198 198 196</p>
+
+<p>100 trials: (18.9% to 20.6% success rate)</p>
+
+<p>2049 1945 2018 2020 1997 2056 1895 2025 2002 1957</p>
+
+</article></slide><slide class=''><hgroup><h2>Simple point estimation</h2></hgroup><article  id="simple-point-estimation">
+
+<ul>
+<li><p>Estimate chance of success \(\theta\) by proportion of successes \[
+\theta^* = \frac{\text{successes}}{\text{trials}}
+\]</p></li>
+<li><p>Simulation shows accuraty depends on amount of data</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Example Interval Calculation</h2></hgroup><article  id="example-interval-calculation">
+
+<ul>
+<li>P% <em>confidence interval:</em> interval in which P% of the estimates are expected to fall</li>
+<li>Simulation computes intervals to any accuracy</li>
+<li>How to do: simulate, sort, inspect the central empirical interval</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Example Interval Calculation</h2></hgroup><article  id="example-interval-calculation-1">
+
+<ul>
+<li>To calcualte 95% confidence interval of estimate based on 10000 samples</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>sims &lt;- rbinom(10000, 1000, 0.2)/1000
+quantile(sims, probs = c(0.025, 0.975))</pre>
+
+<p>2.5% 97.5% 0.176 0.225</p>
+
+<p>The 95% confidence interval is: ( 0.176 0.225 )</p>
+
+</article></slide><slide class=''><hgroup><h2>Estimator Bias</h2></hgroup><article  id="estimator-bias">
+
+<ul>
+<li><p><em>Bias:</em> expected difference of estimate from true value</p></li>
+<li><p>continuous previous examples</p></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>sims &lt;- rbinom(10000, 1000, 0.2)/1000
+quantile(sims, probs = 0.5))</pre>
+
+<pre class = 'prettyprint lang-r'>sims &lt;- rbinom(10000, 1000, 0.2)/1000
+quantile(sims, probs = 0.5)</pre>
+
+<p>50% 0.2</p>
+
+<ul>
+<li>Central value of 0.2 shows this estiamator is <strong>unbiased</strong></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Simple Point Estimation</h2></hgroup><article  id="simple-point-estimation-1">
+
+<ul>
+<li><em>Central Limit Theorem:</em> <strong>expected</strong> error in \(\theta^{*}\) goes down as \[
+\frac{1}{\sqrt{N}}
+\]</li>
+<li>a decimal place of accuracy requires \(100\times\) more samples</li>
+<li>The width of confidence intervals shrinks at the same rate</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Quiz!</h2></hgroup><article  id="quiz">
+
+<p><img src="main_files/figure-html/quiz-1.png" width="720" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Quiz!</h2></hgroup><article  id="quiz-1">
 
-<p><img src="main_files/figure-html/quiz2-1.png" title="" alt="" width="720" style="display: block; margin: auto;" /></p>
+<p><img src="main_files/figure-html/quiz2-1.png" width="720" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Quiz Answer</h2></hgroup><article  id="quiz-answer">
 
@@ -124,17 +225,17 @@
 <li>Mix simulation of repeated i.i.d trials with 20% of success and sort</li>
 </ul>
 
-<pre >## 0/10 1/10 1/10 14/100 15/100 
+<pre >## 1/10 16/100 16/100 17/100 17/100 
 ##  
-##  18/100 19/100 192/1000 193/1000 195/1000 
+##  18/100 19/100 190/1000 191/1000 194/1000 
 ##  
-##  196/1000 198/1000 2/10 20/100 20/100 
+##  198/1000 199/1000 2/10 2/10 2/10 
 ##  
-##  20/100 205/1000 206/1000 207/1000 217/1000 
+##  2/10 2/10 205/1000 21/100 21/100 
 ##  
-##  223/1000 23/100 26/100 28/100 3/10 
+##  216/1000 216/1000 218/1000 225/1000 23/100 
 ##  
-##  3/10 3/10 4/10 4/10 4/10</pre>
+##  25/100 3/10 3/10 3/10 4/10</pre>
 
 <ul class = 'build'>
 <li>More variation in observed rates with smaller sample sizes</li>
@@ -142,6 +243,113 @@
 
 <ul class = 'build'>
 <li><em>Answer:</em> High cancer and low cancer counties are small populations</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Observations, conterfactuals and random variables</h2></hgroup><article  id="observations-conterfactuals-and-random-variables">
+
+<ul>
+<li>Assume we observe data \(\mathbf y = y_1,\ldots, y_N\)</li>
+<li>Statistical modelling assumes even though \(\mathbf y\) is observed, the values could have been different</li>
+<li>John Stuart Mill first characterized this <em>conterfactual</em> nature of statistical modelling
+
+<ul>
+<li>A System of Logic, Rationative and Inductive (1843)</li>
+</ul></li>
+<li>In modern (Kolmogorov) language, \(\mathbf y\) is a <em>random variable</em></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Likelihood functions</h2></hgroup><article  id="likelihood-functions">
+
+<ul>
+<li>A <em>likelihood function</em> is a probability function
+
+<ul>
+<li>density, mass or mixed \[
+p(y\vert\theta , x)
+\] where \(\theta\) is a vector of <strong>parameters</strong></li>
+</ul></li>
+<li>\(x\) is some fixed data
+
+<ul>
+<li>regression predictors or <em>features</em></li>
+</ul></li>
+<li>A <strong>likelihood function</strong> is considered as a function \(L(\theta)\) of \(\theta\) for fixed \(x\) and \(y\)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Maximum Likelihood Estimation</h2></hgroup><article  id="maximum-likelihood-estimation">
+
+<ul>
+<li><p>The statistical inference problem is to estimate parameters \(\theta\) given observations \(y\)</p></li>
+<li>Maximum Likelihood Estimation (MLE) chooses the estimate \(\theta^*\) that meximizes the likelihood function \[
+\theta^* = \text{arg max}_\theta L(\theta) = \text{arg max}_\theta p(y\vert\theta, x)
+\]</li>
+<li><p>this function of \(L\) and \(y\) (and \(x\)) is called <strong>estimator</strong></p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Example of MLE</h2></hgroup><article  id="example-of-mle" class="smaller">
+
+<ul>
+<li><p>The frequency-based estimate \[
+\theta^* = \frac{1}{N}\sum_{i=1}^N y_i
+\] is the observed rate of <em>success</em> (outcome 1) observations</p></li>
+<li><p>The MLE for the model \[
+p(y\vert\theta) = \prod_{i=1}^N p(y_i\vert\theta) = \prod_{i=1}^N \text{Bernoulli}(y_i\vert\theta)
+\] where for \(u\in\{0,1\}\) \[
+\text{Bernoulli}(y_i\vert\theta) =\left\{ \begin{array}{ll}
+\theta &amp; \text{if } u=1\\
+1-\theta &amp; \text{if } u=0\\
+\end{array}
+\right.
+\]</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Example of MLE</h2></hgroup><article  id="example-of-mle-1" class="smaller">
+
+<ul>
+<li>The frequency-based estimate is the MLE
+
+<ul>
+<li>derivative is zero (indicating min or max) \[
+L^{&#39;}(\theta^*) =0
+\]</li>
+<li>second derivative is negative (indicating max) \[
+L^{&#39;&#39;}(\theta^*) &lt; 0
+\]</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Example of MLE</h2></hgroup><article  id="example-of-mle-2" class="smaller">
+
+<ul>
+<li>First modelling <strong>assumption</strong> is that data are i.i.d.</li>
+</ul>
+
+<p>\[
+p(y\vert\theta) = \prod_{i=1}^N p(y_i\vert\theta)
+\]</p>
+
+<ul>
+<li>Second modelling <strong>assumption</strong> is form of likelihood \[
+p(y_i\vert\theta) = \text{Bernoulli}(y_i\vert\theta)
+\]</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Beware: MLEs can be dangerous</h2></hgroup><article  id="beware-mles-can-be-dangerous">
+
+<ul>
+<li>Recall cancer cluster example</li>
+<li>Accuracy is low with smalls counts</li>
+<li>Hierarchical models are what we need</li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>Bayesian Inference</h2></hgroup><article  id="bayesian-inference">
+
+</article></slide><slide class=''><hgroup><h2>Bayesian Data Analysis</h2></hgroup><article  id="bayesian-data-analysis">
+
+<ul>
+<li><p>By Bayesian data analysis, we mean practical methods for making inferences from data using probability models for quantities we observe and about which we wish to learn</p></li>
+<li><p>The essential characteristic of Bayesian methods is their <strong>explicit use of probability for quantifying uncertainty</strong> in inferences based on statistical analysis</p></li>
+<li><p>from Gelman et al. <strong>Bayesian Data Analysis</strong> 3rd edition 2013</p></li>
 </ul>
 
 </article></slide><slide class=''><hgroup><h2>Bayesian Mechanics</h2></hgroup><article  id="bayesian-mechanics">
@@ -333,7 +541,7 @@ Beta(\theta\vert \alpha, \beta) = \int_0^1 u^{\alpha-1}(1-u)^{\beta-1}du = \frac
 
 </article></slide><slide class=''><hgroup><h2>Beta Distribution examples</h2></hgroup><article  id="beta-distribution-examples">
 
-<p><img src="main_files/figure-html/unnamed-chunk-2-1.png" title="" alt="" width="960" /></p>
+<p><img src="main_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Posterior distribution</h2></hgroup><article  id="posterior-distribution">
 
@@ -422,7 +630,7 @@ Pr[\theta_1 &gt; \theta_2 \vert y, N] &amp;=&amp;
 <li>Plot of posterior difference \(p(\theta_2 -\theta_1 \vert y N)\) (B-A)</li>
 </ul>
 
-<p><img src="main_files/figure-html/unnamed-chunk-3-1.png" title="" alt="" width="720" /></p>
+<p><img src="main_files/figure-html/unnamed-chunk-9-1.png" width="720" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Visualizing Posterior Difference</h2></hgroup><article  id="visualizing-posterior-difference-1">
 
@@ -430,7 +638,7 @@ Pr[\theta_1 &gt; \theta_2 \vert y, N] &amp;=&amp;
 <li>Plot of posterior difference \(p(\theta_2 -\theta_1 \vert y N)\) (B-A)</li>
 </ul>
 
-<p><img src="main_files/figure-html/unnamed-chunk-4-1.png" title="" alt="" width="720" /></p>
+<p><img src="main_files/figure-html/unnamed-chunk-10-1.png" width="720" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Visualizing Posterior Difference</h2></hgroup><article  id="visualizing-posterior-difference-2" class="smaller">
 
@@ -467,7 +675,7 @@ n.chains=1, n.iter=10000, n.burnin=2000, n.thin=1,
 plot(density(theta.post), main= &quot;posterior probability&quot;, 
      xlab=expression(theta[2]-theta[1]) )</pre>
 
-<p><img src="main_files/figure-html/unnamed-chunk-5-1.png" title="" alt="" width="288" /></p>
+<p><img src="main_files/figure-html/unnamed-chunk-11-1.png" width="288" /></p>
 
 <pre class = 'prettyprint lang-r'>quantile(theta.post, probs=c(.025, .5, .975))</pre>
 
@@ -613,8 +821,8 @@ Beta(y_1+\ldots +y_K, N_1 +\ldots N_K)
 </article></slide><slide class=''><hgroup><h2>Getting the slides</h2></hgroup><article  id="getting-the-slides">
 
 <ul>
-<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''><a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a></a>.</li>
-<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''><a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a></a>.</li>
+<li>The slides for this course were created with Rmarkdown: <a href='http://rmarkdown.rstudio.com/' title=''>http://rmarkdown.rstudio.com/</a>.</li>
+<li>They are available from <a href='https://github.com/berkeley3/BDA' title=''>https://github.com/berkeley3/BDA</a>.</li>
 <li><p>To re-compile the slides:</p>
 
 <ul>

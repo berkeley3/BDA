@@ -14,6 +14,104 @@ output:
   slidy_presentation: default
 ---
 
+## Repeated i.i.d. trials
+
+- Suppose to generate a  outcome from among several potential outcomes
+- Suppose outcome chances are the same each time
+    - outcomes are independent and identically distributed (i.i.d)
+
+- Suppose the outcome is binary (e.g. 0,1; dead/alive,...)
+    - 20% chance of outcome 1
+    - 80% chance of outcome 0
+
+- Consider different numbers of trials
+    - how will proportion of successes in sample differ?
+    
+## Simulating i.i.d. Binary Trials
+```{r, eval=FALSE}
+
+rbinom(10, N, 0.2)/N
+
+```
+
+
+```{r, echo=FALSE, results='asis'}
+successes <- rbinom(10,10,0.2)
+cat(paste0('\n10 trials: (', 100*min(successes)/10,'% to ', 100*max(successes)/10, "% success rate)\n"))
+cat('\n',successes, '\n')
+successes <- rbinom(10,100,0.2)
+cat(paste0('\n100 trials: (', 100*min(successes)/100,'% to ', 100*max(successes)/100, "% success rate)\n"))
+cat('\n',successes, '\n')
+successes <- rbinom(10,1000,0.2)
+cat(paste0('\n100 trials: (', 100*min(successes)/1000,'% to ', 100*max(successes)/1000, "% success rate)\n"))
+cat('\n',successes, '\n')
+successes <- rbinom(10,10000,0.2)
+cat(paste0('\n100 trials: (', round(100*min(successes)/10000,1),'% to ', round(100*max(successes)/10000,1), "% success rate)\n"))
+cat('\n',successes, '\n')
+
+```
+
+
+## Simple point estimation
+- Estimate chance of success $\theta$ by proportion of successes
+$$
+\theta^* = \frac{\text{successes}}{\text{trials}}
+$$
+
+- Simulation shows accuraty depends on amount of data
+
+## Example Interval Calculation
+
+- P% _confidence interval:_ interval in which P% of the estimates are expected to fall
+- Simulation computes intervals to any accuracy
+- How to do: simulate, sort, inspect the central empirical interval
+
+## Example Interval Calculation
+
+- To calcualte 95% confidence interval of estimate based on 10000 samples
+
+```{r, results='asis'}
+
+sims <- rbinom(10000, 1000, 0.2)/1000
+quantile(sims, probs = c(0.025, 0.975))
+```
+
+```{r, echo=FALSE, results='asis'}
+cat('The 95% confidence interval is: (',quantile(sims, probs = c(0.025, 0.975)),')')
+```
+
+
+
+## Estimator Bias
+
+- _Bias:_ expected difference of estimate from true value
+
+- continuous previous examples
+
+```{r, eval=FALSE}
+
+sims <- rbinom(10000, 1000, 0.2)/1000
+quantile(sims, probs = 0.5))
+```
+
+```{r, results='asis'}
+
+sims <- rbinom(10000, 1000, 0.2)/1000
+quantile(sims, probs = 0.5)
+```
+
+- Central value of 0.2 shows this estiamator is __unbiased__
+
+## Simple Point Estimation
+
+- _Central Limit Theorem:_ __expected__ error in $\theta^{*}$ goes down as 
+$$
+\frac{1}{\sqrt{N}}
+$$ 
+- a decimal place of accuracy requires $100\times$ more samples
+- The width of confidence intervals shrinks at the same rate
+
+
 ## Quiz!
 
 ```{r quiz, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
@@ -106,6 +204,100 @@ cat(output[1:5],'\n','\n', output[6:10],'\n','\n', output[11:15],'\n',
 > - More variation in observed rates with smaller sample sizes
 
 > - _Answer:_ High cancer and low cancer counties are small populations
+
+## Observations, conterfactuals and random variables
+
+- Assume we observe data $\mathbf y = y_1,\ldots, y_N$
+- Statistical modelling assumes even though $\mathbf y$ is observed, the values could have been different
+- John Stuart Mill first characterized this _conterfactual_ nature of statistical modelling
+    - A System of Logic, Rationative and Inductive (1843)
+- In modern (Kolmogorov) language, $\mathbf y$ is a _random variable_
+
+## Likelihood functions
+
+- A _likelihood function_ is a probability function 
+    - density, mass or mixed
+$$
+p(y\vert\theta , x)
+$$
+where $\theta$ is a vector of __parameters__
+- $x$ is some fixed data
+    - regression predictors or _features_
+- A __likelihood function__ is considered as a function $L(\theta)$ of $\theta$ for fixed $x$ and $y$
+
+## Maximum Likelihood Estimation
+
+- The statistical inference problem is to estimate parameters $\theta$ given observations $y$
+
+- Maximum Likelihood Estimation (MLE) chooses the estimate $\theta^*$ that meximizes the likelihood function
+$$
+\theta^* = \text{arg max}_\theta L(\theta) = \text{arg max}_\theta p(y\vert\theta, x)
+$$
+- this function of $L$ and $y$ (and $x$) is called __estimator__
+
+
+## Example of MLE {.smaller}
+
+- The frequency-based estimate
+$$
+\theta^* = \frac{1}{N}\sum_{i=1}^N y_i
+$$
+is the observed rate of _success_ (outcome 1) observations
+
+- The MLE for the  model
+$$
+p(y\vert\theta) = \prod_{i=1}^N p(y_i\vert\theta) = \prod_{i=1}^N \text{Bernoulli}(y_i\vert\theta)
+$$
+where for $u\in\{0,1\}$
+$$
+\text{Bernoulli}(y_i\vert\theta) =\left\{ \begin{array}{ll}
+\theta & \text{if } u=1\\
+1-\theta & \text{if } u=0\\
+\end{array}
+\right.
+$$
+
+## Example of MLE {.smaller}
+
+- The frequency-based estimate is the MLE 
+    - derivative is zero (indicating min or max)
+$$
+L^{'}(\theta^*) =0
+$$
+    - second derivative is negative (indicating max)
+$$
+L^{''}(\theta^*) < 0
+$$
+
+
+## Example of MLE {.smaller}
+
+- First modelling __assumption__ is that data are i.i.d.
+
+$$
+p(y\vert\theta) = \prod_{i=1}^N p(y_i\vert\theta)
+$$
+
+- Second modelling __assumption__ is form of likelihood
+$$
+p(y_i\vert\theta) = \text{Bernoulli}(y_i\vert\theta)
+$$
+
+## Beware: MLEs can be dangerous
+
+- Recall cancer cluster example
+- Accuracy is low with smalls counts
+- Hierarchical models are what we need
+
+# Bayesian Inference
+
+## Bayesian Data Analysis
+- By Bayesian data analysis, we mean practical methods for making inferences from data using probability models for quantities we observe and about which we wish to learn
+
+- The essential characteristic of Bayesian methods is their __explicit use of probability for quantifying uncertainty__ in inferences based on statistical analysis
+
+- from Gelman et al. __Bayesian Data Analysis__ 3rd edition 2013
+
 
 ## Bayesian Mechanics
 <!-- THIS IS A COMMENTED TEXT EVEN FOR MARKDOWN :-) -->
