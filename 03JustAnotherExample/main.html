@@ -152,7 +152,7 @@
 </article></slide><slide class=''><hgroup><h2>Brown&amp;Prescott (Applied Mixed Models in Medicine, 2006)</h2></hgroup><article  id="brownprescott-applied-mixed-models-in-medicine-2006-1">
 
 <pre >## &lt;!-- html table generated in R 3.2.5 by xtable 1.8-2 package --&gt;
-## &lt;!-- Sun Jun 12 23:48:46 2016 --&gt;
+## &lt;!-- Mon Jun 13 22:30:39 2016 --&gt;
 ## &lt;table border=0&gt;
 ## &lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; ID &lt;/th&gt; &lt;th&gt; Treatment &lt;/th&gt; &lt;th&gt; Period &lt;/th&gt; &lt;th&gt; OED_base &lt;/th&gt; &lt;th&gt; DBP_base &lt;/th&gt; &lt;th&gt; OED &lt;/th&gt; &lt;th&gt; DBP &lt;/th&gt;  &lt;/tr&gt;
 ##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 101 &lt;/td&gt; &lt;td&gt; B &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 1 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 45 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt; 180 &lt;/td&gt; &lt;td&gt; 45 &lt;/td&gt; &lt;td&gt; 165 &lt;/td&gt; &lt;/tr&gt;
@@ -309,6 +309,36 @@ modelUpdate(50000)     </pre>
 <ul>
 <li>To check for deviations from the normality assumption, the log-normal distribution can be used (higher DIC values)</li>
 </ul>
+
+</article></slide><slide class=''><hgroup><h2>DIC: computational note</h2></hgroup><article  id="dic-computational-note" class="smaller">
+
+<p>For a hierarchical model with the structure \[
+\begin{array}{rl}
+Y_i \vert u_i &amp;\sim&amp; f(y_i\vert u_i, \boldsymbol\theta)\\
+u_i &amp;\sim&amp; f(u_i\vert \boldsymbol\theta_u)\\
+\end{array}
+\] DIC is computed using deviance measure \[
+D_c(\mathbf u, \boldsymbol \theta) = -2\log f(\mathbf y\vert \mathbf u, \boldsymbol \theta)
+\] based on the conditional likelihood \[
+f(\mathbf y\vert \mathbf u, \boldsymbol \theta) = \prod_{i=1}^n
+ f(y_i\vert u_i,\boldsymbol \theta)
+\]</p>
+
+<p>DIC is given by \[
+\text{DIC} = 2\overline{D_c(\mathbf u, \boldsymbol \theta)}-D_c(\bar{\mathbf u}, \bar{\boldsymbol \theta})
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>DIC: computational note</h2></hgroup><article  id="dic-computational-note-1">
+
+<p>When model is fitted directly \[
+Y_i \sim f(y_i\vert \boldsymbol \theta, \boldsymbol \theta_u)
+\] based on the marginal distribution \[
+f(Y_i\vert \boldsymbol \theta, \boldsymbol \theta_u) = \int f(Y_i\vert\boldsymbol \theta, u_i) f(u_i\vert\boldsymbol \theta_u)du_i
+\] the DIC is given by \[
+\text{DIC} = 2\overline{D(\boldsymbol \theta, \boldsymbol \theta_u)}-D(\bar{\boldsymbol\theta}, \bar{\boldsymbol \theta}_u)
+\] with \[
+D(\boldsymbol\theta, \boldsymbol \theta_u) = -2\sum_{i=1}^n \log f(Y_i\vert\boldsymbol\theta, \boldsymbol \theta_u)
+\]</p>
 
 </article></slide><slide class=''><hgroup><h2>Final Model</h2></hgroup><article  id="final-model">
 

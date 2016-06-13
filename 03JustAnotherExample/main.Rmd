@@ -191,7 +191,51 @@ modelUpdate(50000)
 
 - To check for deviations from the normality assumption, the log-normal distribution can be used (higher DIC values)
 
+## DIC: computational note {.smaller}
+
+For a hierarchical model with the structure
+$$
+\begin{array}{rl}
+Y_i \vert u_i &\sim& f(y_i\vert u_i, \boldsymbol\theta)\\
+u_i &\sim& f(u_i\vert \boldsymbol\theta_u)\\
+\end{array}
+$$
+DIC is computed using deviance measure
+$$
+D_c(\mathbf u, \boldsymbol \theta) = -2\log f(\mathbf y\vert \mathbf u, \boldsymbol \theta)
+$$
+based on the conditional likelihood
+$$
+f(\mathbf y\vert \mathbf u, \boldsymbol \theta) = \prod_{i=1}^n
+ f(y_i\vert u_i,\boldsymbol \theta)
+$$
+
+DIC is given by
+$$
+\text{DIC} = 2\overline{D_c(\mathbf u, \boldsymbol \theta)}-D_c(\bar{\mathbf u}, \bar{\boldsymbol \theta})
+$$
+
+## DIC: computational note
+
+When model is fitted directly
+$$
+Y_i \sim f(y_i\vert \boldsymbol \theta, \boldsymbol \theta_u)
+$$
+based on the marginal distribution
+$$
+f(Y_i\vert \boldsymbol \theta, \boldsymbol \theta_u) = \int f(Y_i\vert\boldsymbol \theta, u_i) f(u_i\vert\boldsymbol \theta_u)du_i
+$$
+the DIC is given by
+$$
+\text{DIC} = 2\overline{D(\boldsymbol \theta, \boldsymbol \theta_u)}-D(\bar{\boldsymbol\theta}, \bar{\boldsymbol \theta}_u)
+$$
+with
+$$
+D(\boldsymbol\theta, \boldsymbol \theta_u) = -2\sum_{i=1}^n \log f(Y_i\vert\boldsymbol\theta, \boldsymbol \theta_u)
+$$
+
 ## Final Model
+
 
  <center><img src="images/Model4.png" width="600px" height="400px" /></center>
 
