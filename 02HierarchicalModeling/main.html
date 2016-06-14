@@ -565,6 +565,131 @@ codaSamples = coda.samples( jagsModel , variable.names=parameters ,
 
 plot(codaSamples)</pre>
 
+</article></slide><slide class=''><hgroup><h2>Hierachical models for count data</h2></hgroup><article  id="hierachical-models-for-count-data">
+
+<ul>
+<li>1990 USA general social survey data
+
+<ul>
+<li>number of sexual intercourses of each participant within the previous month (data provided in Agresti 2002)</li>
+</ul></li>
+<li>Data consists of 550 observations.</li>
+<li>\(G_i\) defines the gender of subject \(i\)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>The Poisson-gamma model</h2></hgroup><article  id="the-poisson-gamma-model">
+
+<ul>
+<li>The Poisson-gamma model is frequently used to model count data with overdispersion \[
+\begin{eqnarray}
+Y_i &amp;\sim&amp; \text{Poisson}(\lambda_i u_i)\\
+u_i &amp;\sim&amp; \text{Gamma}(r_i, r_i)
+\end{eqnarray}
+\]</li>
+<li><p>Covariates can be used to define both \(\lambda_i\) and \(u_i\)</p></li>
+<li><p>The marginal likelihood of this hierarchical model is given by integrating the random effects \(u_i\) resulting in a negative binomial distribution</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Code</h2></hgroup><article  id="code" class="smaller">
+
+<pre class = 'prettyprint lang-r'>model{
+        for(i in 1:n){ 
+            # Poisson part
+            y[i] ~ dpois( mu[i] )
+            # defining the mean of the Poisson
+            mu[i] &lt;- lambda[ gender[i]+1 ] * u[i]
+            # mixing distribution 
+            u[i] ~ dgamma( r[ gender[i]+1 ] , r[ gender[i]+1 ]  )
+        }   
+        for (j in 1:2){
+            # prior distributions
+            lambda[j]~dgamma( 0.001, 0.001 )
+            r[j]~dgamma( 0.001, 0.001 )
+            # dispersion index
+            di[j] &lt;-(1+lambda[j]/r[j])
+            # assumed variance
+            var[j] &lt;- lambda[j]*di[j]
+            # negative binomial probability
+            p[j] &lt;- r[j]/(r[j]+lambda[j])
+        }
+
+
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Poisson-log-normal model</h2></hgroup><article  id="poisson-log-normal-model">
+
+<ul>
+<li>A usual practive in building hierarchical model is to express the model as GLM
+
+<ul>
+<li>add random errors/effects to the linear predictor \[
+\begin{eqnarray}
+Y_i &amp;\sim&amp; \text{Poisson}(\mu_i)\\
+\log(\mu_i) &amp;= &amp; \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip} + \epsilon_i\\
+e_i &amp;\sim&amp; \text{Normal}(0,\sigma_\epsilon^2)\\
+\end{eqnarray}
+\]</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Poisson-log-normal model</h2></hgroup><article  id="poisson-log-normal-model-1">
+
+<ul>
+<li><p>In the following example, only one covariate is assumed (gender) \[
+\begin{eqnarray}
+Y_i &amp;\sim&amp; \text{Poisson}(\lambda_i\mu_i)\\
+u_i = \exp(\epsilon_i) &amp;\sim&amp; \text{LN}(0,\sigma_\epsilon^2)\\
+\log(\lambda_i) &amp; = &amp; \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip} + \epsilon_i\\
+\end{eqnarray}
+\]</p></li>
+<li>This structure is identical to the one used for the Poisson-gamma model
+
+<ul>
+<li>the mixing distribution is no longer gamma but log-normal</li>
+</ul></li>
+<li><p>The only difference between the two models lies in the assumption on the distribution of the random effects and the data distribution</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Poisson-log-normal model</h2></hgroup><article  id="poisson-log-normal-model-2">
+
+<ul>
+<li>The probability distribution of the Poisson-Log Normal distribution is not analytically derivable</li>
+<li>interpretation of this model is more complicated</li>
+<li>However mean and variance can be calculated \[
+\begin{eqnarray}
+E(Y\vert\lambda\sigma_\epsilon^2) &amp;=&amp; \lambda \exp(\sigma_\epsilon^2/2)\\
+V(Y\vert\lambda\sigma_\epsilon^2) &amp;=&amp; \lambda \exp(\sigma_\epsilon^2/2) + \lambda^2 \exp(2 \sigma_\epsilon^2/2) - \lambda^2 \exp(\sigma_\epsilon^2/2)
+\end{eqnarray}
+\]</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Code</h2></hgroup><article  id="code-1" class="smaller">
+
+<pre class = 'prettyprint lang-r'>model{
+        for(i in 1:n){ 
+            # Poisson part
+            y[i] ~ dpois( mu[i] )
+            # defining the mean of the Poisson
+            log(mu[i]) &lt;- beta[ gender[i]+1] + epsilon[i] 
+            # mixing distribution 
+            epsilon[i] ~ dnorm( 0, tau[ gender[i]+1] )
+        }   
+        for (j in 1:2){
+            # prior distributions
+            beta[j]~dnorm( 0, 0.001)
+            #tau[j] ~ dunif(0,100)
+           tau[j]~dgamma(0.001,0.001)
+            s[j] &lt;- sqrt( 1/tau[j] )
+            s2[j]&lt;-1/tau[j]
+            # 
+            lambda[j] &lt;- exp(beta[j])
+            mean.gender[j] &lt;- exp(beta[j] + 0.5*s2[j] )
+            var[j] &lt;- lambda[j]*exp( s2[j]/2 ) + lambda[j]*lambda[j]*exp( 2*s2[j] ) - lambda[j]*lambda[j]*exp( s2[j] )
+            DI[j] &lt;- var[j]/mean.gender[j] 
+        }
+        
+}</pre>
+
 </article></slide><slide class=''><hgroup><h2>Just Another Example: analysis of odds ratio from various studies</h2></hgroup><article  id="just-another-example-analysis-of-odds-ratio-from-various-studies">
 
 <ul>
@@ -737,7 +862,7 @@ Y_{i1k} &amp;\sim &amp; Bin(\pi_{i1k}, Y_{i1k}+Y_{i2k}) \\
 
 </article></slide><slide class=''><hgroup><h2>Plot</h2></hgroup><article  id="plot">
 
-<p><img src="main_files/figure-html/unnamed-chunk-15-1.png" width="720" /></p>
+<p><img src="main_files/figure-html/unnamed-chunk-17-1.png" width="720" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Practical</h2></hgroup><article  id="practical">
 

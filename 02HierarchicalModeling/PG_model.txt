@@ -1,0 +1,26 @@
+
+model{
+        for(i in 1:n){ 
+# Poisson part
+y[i] ~ dpois( mu[i] )
+# defining the mean of the Poisson
+mu[i] <- lambda[ gender[i]+1 ] * u[i]
+# mixing distribution 
+u[i] ~ dgamma( r[ gender[i]+1 ] , r[ gender[i]+1 ]  )
+}	
+for (j in 1:2){
+# prior distributions
+lambda[j]~dgamma( 0.001, 0.001 )
+r[j]~dgamma( 0.001, 0.001 )
+# dispersion index
+di[j] <-(1+lambda[j]/r[j])
+# assumed variance
+var[j] <- lambda[j]*di[j]
+# negative binomial probability
+p[j] <- r[j]/(r[j]+lambda[j])
+}
+
+
+}
+
+

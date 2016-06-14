@@ -362,6 +362,128 @@ codaSamples = coda.samples( jagsModel , variable.names=parameters ,
 plot(codaSamples)
 ```
 
+## Hierachical models for count data
+
+- 1990 USA general social survey data 
+    - number of sexual intercourses of each participant within the previous month (data provided in Agresti 2002)
+
+- Data consists of 550 observations.
+- $G_i$ defines the gender of subject $i$
+
+## The Poisson-gamma model
+
+- The Poisson-gamma model is frequently used to model count data with overdispersion
+$$
+\begin{eqnarray}
+Y_i &\sim& \text{Poisson}(\lambda_i u_i)\\
+u_i &\sim& \text{Gamma}(r_i, r_i)
+\end{eqnarray}
+$$
+- Covariates can be used to define both $\lambda_i$ and $u_i$
+
+- The marginal likelihood of this hierarchical model is given by integrating the random effects $u_i$ resulting in a negative binomial distribution
+
+## Code  {.smaller}
+
+```{r, eval=FALSE}
+
+model{
+        for(i in 1:n){ 
+            # Poisson part
+			y[i] ~ dpois( mu[i] )
+			# defining the mean of the Poisson
+            mu[i] <- lambda[ gender[i]+1 ] * u[i]
+            # mixing distribution 
+            u[i] ~ dgamma( r[ gender[i]+1 ] , r[ gender[i]+1 ]  )
+	    }	
+	    for (j in 1:2){
+	        # prior distributions
+            lambda[j]~dgamma( 0.001, 0.001 )
+            r[j]~dgamma( 0.001, 0.001 )
+            # dispersion index
+            di[j] <-(1+lambda[j]/r[j])
+            # assumed variance
+            var[j] <- lambda[j]*di[j]
+            # negative binomial probability
+            p[j] <- r[j]/(r[j]+lambda[j])
+        }
+
+
+}
+
+```
+
+
+## Poisson-log-normal model
+
+- A usual practive in building hierarchical model is to express the model as GLM
+    - add random errors/effects to the linear predictor
+$$
+\begin{eqnarray}
+Y_i &\sim& \text{Poisson}(\mu_i)\\
+\log(\mu_i) &= & \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip} + \epsilon_i\\
+e_i &\sim& \text{Normal}(0,\sigma_\epsilon^2)\\
+\end{eqnarray}
+$$
+
+## Poisson-log-normal model
+
+- In the following example, only one covariate is assumed (gender)
+$$
+\begin{eqnarray}
+Y_i &\sim& \text{Poisson}(\lambda_i\mu_i)\\
+u_i = \exp(\epsilon_i) &\sim& \text{LN}(0,\sigma_\epsilon^2)\\
+\log(\lambda_i) & = & \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip} + \epsilon_i\\
+\end{eqnarray}
+$$
+
+- This structure is identical to the one used for the Poisson-gamma model
+    - the mixing distribution is no longer gamma but log-normal
+- The only difference between the two models lies in the assumption on the distribution of the random effects and the data distribution
+
+
+## Poisson-log-normal model
+
+- The probability distribution of the Poisson-Log Normal distribution is not analytically derivable
+  - interpretation of this model is more complicated
+- However mean and variance can be calculated
+$$
+\begin{eqnarray}
+E(Y\vert\lambda\sigma_\epsilon^2) &=& \lambda \exp(\sigma_\epsilon^2/2)\\
+V(Y\vert\lambda\sigma_\epsilon^2) &=& \lambda \exp(\sigma_\epsilon^2/2) + \lambda^2 \exp(2 \sigma_\epsilon^2/2) - \lambda^2 \exp(\sigma_\epsilon^2/2)
+\end{eqnarray}
+$$
+
+## Code {.smaller}
+
+```{r, eval=FALSE}
+
+model{
+        for(i in 1:n){ 
+            # Poisson part
+			y[i] ~ dpois( mu[i] )
+			# defining the mean of the Poisson
+            log(mu[i]) <- beta[ gender[i]+1] + epsilon[i] 
+            # mixing distribution 
+            epsilon[i] ~ dnorm( 0, tau[ gender[i]+1] )
+	    }	
+	    for (j in 1:2){
+	        # prior distributions
+            beta[j]~dnorm( 0, 0.001)
+            #tau[j] ~ dunif(0,100)
+           tau[j]~dgamma(0.001,0.001)
+            s[j] <- sqrt( 1/tau[j] )
+            s2[j]<-1/tau[j]
+            # 
+            lambda[j] <- exp(beta[j])
+            mean.gender[j] <- exp(beta[j] + 0.5*s2[j] )
+            var[j] <- lambda[j]*exp( s2[j]/2 ) + lambda[j]*lambda[j]*exp( 2*s2[j] ) - lambda[j]*lambda[j]*exp( s2[j] )
+            DI[j] <- var[j]/mean.gender[j] 
+        }
+		
+}
+
+```
 
 
 ## Just Another Example: analysis of odds ratio from various studies
