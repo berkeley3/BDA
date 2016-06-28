@@ -44,4 +44,4 @@ No specific mathematical expertise is required. Some familiarity with statistica
 
 * Paola Berchialla
 
-<!----_Material is under development and subject to change._> 
+<!----_Material is under development and subject to change._----> 
